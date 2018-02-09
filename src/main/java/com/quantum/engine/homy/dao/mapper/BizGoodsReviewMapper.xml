@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quantum.engine.homy.dao.BizGoodsReviewMapper">
+  <resultMap id="BaseResultMap" type="com.quantum.engine.homy.model.BizGoodsReview">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="goods_item_id" jdbcType="INTEGER" property="goodsItemId" />
+    <result column="score" jdbcType="INTEGER" property="score" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="review_time" jdbcType="TIMESTAMP" property="reviewTime" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="is_valid" jdbcType="INTEGER" property="isValid" />
+    <result column="pid" jdbcType="INTEGER" property="pid" />
+    <result column="un_show_name" jdbcType="INTEGER" property="unShowName" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="BaseResultWithNameAndPicMap" type="com.quantum.engine.homy.model.ext.BizGoodsReviewExt">
+    <result column="username" jdbcType="VARCHAR" property="userName" />
+    <result column="portrait" jdbcType="VARCHAR" property="portrait" />
+    <collection property="imgs" ofType="java.lang.String" column="id" select="com.quantum.engine.homy.dao.BasImageMapper.getPathByReviewId"></collection>
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, goods_item_id, score, content, review_time, user_id, is_valid, pid, un_show_name
+  </sql>
+  <sql id="Ext_Column_List">
+    bgr.id, bgr.goods_item_id, bgr.score, bgr.content, bgr.review_time,
+     bgr.user_id, bgr.is_valid, pid, bgr.un_show_name, bu.username, bu.portrait
+  </sql>
+  <select id="getCountByItemIds" resultType="java.lang.Integer" >
+  	select count(*) from biz_goods_review where goods_item_id in 
+  	<foreach collection="itemIds" index="index" item="item" close=")" open="(" separator=",">
+  		#{item}
+  	</foreach>
+  </select>
+  <select id="getByUserIdAndGoodsItemId" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from biz_goods_review
+    where user_id = #{userId,jdbcType=INTEGER} and goods_item_id = #{goodsItemId}
+  </select>
+  <select id="getReviewList"  resultMap="BaseResultWithNameAndPicMap">
+    select 
+    <include refid="Ext_Column_List" />
+    from biz_goods_review bgr
+    left join biz_order_item boi on boi.id = bgr.goods_item_id
+    left join biz_user bu on bu.user_id = bgr.user_id
+	where boi.goods_id = #{goodsId}
+   	<if test="page != 0">
+   		limit #{startIndex},#{pageSize}
+   	</if>
+  </select>
+  
+  <select id="countByGoodsId" resultType="int" parameterType="int">
+  	select count(1) from biz_goods_review bgr
+    left join biz_order_item boi on boi.id = bgr.goods_item_id
+    where boi.goods_id = #{goodsId}
+  </select>
+  
+  <select id="getLastestReviewByGoodsId"  resultMap="BaseResultWithNameAndPicMap">
+    select 
+    <include refid="Ext_Column_List" />
+    from biz_goods_review bgr
+    left join biz_order_item boi on boi.id = bgr.goods_item_id
+    left join biz_user bu on bu.user_id = bgr.user_id
+	where boi.goods_id = #{goodsId}
+	order by bgr.review_time desc
+   	limit 0,1
+  </select>
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from biz_goods_review
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from biz_goods_review
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.quantum.engine.homy.model.BizGoodsReview" useGeneratedKeys="true" keyProperty="id">
+    insert into biz_goods_review (id, goods_item_id, score, 
+      content, review_time, user_id, 
+      is_valid, pid, un_show_name
+      )
+    values (#{id,jdbcType=INTEGER}, #{goodsItemId,jdbcType=INTEGER}, #{score,jdbcType=INTEGER}, 
+      #{content,jdbcType=VARCHAR}, #{reviewTime,jdbcType=TIMESTAMP}, #{userId,jdbcType=INTEGER}, 
+      #{isValid,jdbcType=INTEGER}, #{pid,jdbcType=INTEGER}, #{unShowName,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.quantum.engine.homy.model.BizGoodsReview">
+    insert into biz_goods_review
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="goodsItemId != null">
+        goods_item_id,
+      </if>
+      <if test="score != null">
+        score,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+      <if test="reviewTime != null">
+        review_time,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="isValid != null">
+        is_valid,
+      </if>
+      <if test="pid != null">
+        pid,
+      </if>
+      <if test="unShowName != null">
+        un_show_name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="goodsItemId != null">
+        #{goodsItemId,jdbcType=INTEGER},
+      </if>
+      <if test="score != null">
+        #{score,jdbcType=INTEGER},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewTime != null">
+        #{reviewTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="isValid != null">
+        #{isValid,jdbcType=INTEGER},
+      </if>
+      <if test="pid != null">
+        #{pid,jdbcType=INTEGER},
+      </if>
+      <if test="unShowName != null">
+        #{unShowName,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.quantum.engine.homy.model.BizGoodsReview">
+    update biz_goods_review
+    <set>
+      <if test="goodsItemId != null">
+        goods_item_id = #{goodsItemId,jdbcType=INTEGER},
+      </if>
+      <if test="score != null">
+        score = #{score,jdbcType=INTEGER},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewTime != null">
+        review_time = #{reviewTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="isValid != null">
+        is_valid = #{isValid,jdbcType=INTEGER},
+      </if>
+      <if test="pid != null">
+        pid = #{pid,jdbcType=INTEGER},
+      </if>
+      <if test="unShowName != null">
+        un_show_name = #{unShowName,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.quantum.engine.homy.model.BizGoodsReview">
+    update biz_goods_review
+    set goods_item_id = #{goodsItemId,jdbcType=INTEGER},
+      score = #{score,jdbcType=INTEGER},
+      content = #{content,jdbcType=VARCHAR},
+      review_time = #{reviewTime,jdbcType=TIMESTAMP},
+      user_id = #{userId,jdbcType=INTEGER},
+      is_valid = #{isValid,jdbcType=INTEGER},
+      pid = #{pid,jdbcType=INTEGER},
+      un_show_name = #{unShowName,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

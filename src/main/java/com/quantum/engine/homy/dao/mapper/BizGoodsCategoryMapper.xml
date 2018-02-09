@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quantum.engine.homy.dao.BizGoodsCategoryMapper">
+	<!-- <cache type="org.mybatis.caches.ehcache.LoggingEhcache" /> -->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+	<resultMap id="BaseResultMap"
+		type="com.quantum.engine.homy.model.BizGoodsCategory">
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="category_name" jdbcType="VARCHAR" property="categoryName" />
+		<result column="category_code" jdbcType="VARCHAR" property="categoryCode" />
+		<result column="icon" jdbcType="VARCHAR" property="icon" />
+		<result column="pid" jdbcType="INTEGER" property="pid" />
+		<result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="create_id" jdbcType="INTEGER" property="createId" />
+		<result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+		<result column="modify_id" jdbcType="INTEGER" property="modifyId" />
+		<result column="app_client_icon" jdbcType="VARCHAR" property="appClientIcon" />
+		<result column="tsort" jdbcType="INTEGER" property="tsort" />
+		<result column="category_type" jdbcType="INTEGER" property="categoryType" />
+	</resultMap>
+	<resultMap extends="BaseResultMap" id="ResultMapWithBLOBs"
+		type="com.quantum.engine.homy.model.BizGoodsCategory">
+		<result column="category_desc" jdbcType="LONGVARCHAR" property="categoryDesc" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, category_name, category_code, icon, pid, create_time, create_id,
+		modify_time, modify_id, app_client_icon, tsort, category_type
+	</sql>
+	<sql id="Blob_Column_List">
+		category_desc
+	</sql>
+	<select id="getAll" resultMap="ResultMapWithBLOBs">
+		select
+		<include refid="Base_Column_List" />
+		,
+		<include refid="Blob_Column_List" />
+		from biz_goods_category order by tsort
+		
+	</select>
+	
+	<select id="getByType" resultMap="ResultMapWithBLOBs" parameterType="int">
+		select
+		<include refid="Base_Column_List" />
+		,
+		<include refid="Blob_Column_List" />
+		from biz_goods_category  where category_type = #{categoryType}
+	</select>
+	
+	<select id="getByTypeAndBrandId" resultMap="ResultMapWithBLOBs" parameterType="int">
+		select
+		<include refid="Base_Column_List" />
+		,
+		<include refid="Blob_Column_List" />
+		from biz_goods_category  where category_type = #{categoryType}
+		and id in (select DISTINCT goods_category_id from biz_goods_base where brand_id = #{brandId})
+	</select>
+	
+	<select id="listHave3dBy" resultMap="ResultMapWithBLOBs" parameterType="int" >
+		select
+		<include refid="Base_Column_List" />
+		,
+		<include refid="Blob_Column_List" />
+		from biz_goods_category 
+		<where>
+			and (
+				id in (
+					select distinct goods_category_id from biz_goods_base where have_3d = 1 and goods_state = 1
+					<if test="brandId !=null and brandId !=''">  
+						 and  brand_id = #{brandId}
+		            </if> 
+				)
+			) 
+		</where>
+	</select>
+	
+	<select id="selectByPrimaryKey" parameterType="java.lang.Integer"
+		resultMap="ResultMapWithBLOBs">
+		select
+		<include refid="Base_Column_List" />
+		,
+		<include refid="Blob_Column_List" />
+		from biz_goods_category
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from biz_goods_category
+		where id = #{id,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.quantum.engine.homy.model.BizGoodsCategory"
+		keyProperty="id" useGeneratedKeys="true">
+		insert into biz_goods_category ( category_name, category_code,
+		icon, pid,
+		create_time, create_id, modify_time,
+		modify_id, category_desc, app_client_icon, tsort, category_type)
+		values ( #{categoryName,jdbcType=VARCHAR}, #{categoryCode,jdbcType=VARCHAR},
+		#{icon,jdbcType=VARCHAR}, #{pid,jdbcType=INTEGER},
+		#{createTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=INTEGER},
+		#{modifyTime,jdbcType=TIMESTAMP},
+		#{modifyId,jdbcType=INTEGER}, #{categoryDesc,jdbcType=LONGVARCHAR}, #{appClientIcon,jdbcType=VARCHAR}, #{tsort,jdbcType=INTEGER}, #{categoryType,jdbcType=INTEGER})
+	</insert>
+	<insert id="insertSelective" parameterType="com.quantum.engine.homy.model.BizGoodsCategory"
+		keyProperty="id" useGeneratedKeys="true">
+		insert into biz_goods_category
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="categoryName != null">
+				category_name,
+			</if>
+			<if test="categoryCode != null">
+				category_code,
+			</if>
+			<if test="icon != null">
+				icon,
+			</if>
+			<if test="pid != null">
+				pid,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="createId != null">
+				create_id,
+			</if>
+			<if test="modifyTime != null">
+				modify_time,
+			</if>
+			<if test="modifyId != null">
+				modify_id,
+			</if>
+			<if test="categoryDesc != null">
+				category_desc,
+			</if>
+			<if test="appClientIcon != null">
+				app_client_icon,
+			</if>
+			<if test="tsort != null">
+				tsort,
+			</if>
+			<if test="categoryType != null">
+				category_type,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="categoryName != null">
+				#{categoryName,jdbcType=VARCHAR},
+			</if>
+			<if test="categoryCode != null">
+				#{categoryCode,jdbcType=VARCHAR},
+			</if>
+			<if test="icon != null">
+				#{icon,jdbcType=VARCHAR},
+			</if>
+			<if test="pid != null">
+				#{pid,jdbcType=INTEGER},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createId != null">
+				#{createId,jdbcType=INTEGER},
+			</if>
+			<if test="modifyTime != null">
+				#{modifyTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="modifyId != null">
+				#{modifyId,jdbcType=INTEGER},
+			</if>
+			<if test="categoryDesc != null">
+				#{categoryDesc,jdbcType=LONGVARCHAR},
+			</if>
+			<if test="appClientIcon != null">
+				#{appClientIcon,jdbcType=VARCHAR},
+			</if>
+			<if test="tsort != null">
+				#{tsort,jdbcType=INTEGER},
+			</if>
+			<if test="categoryType != null">
+				#{categoryType,jdbcType=INTEGER},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.quantum.engine.homy.model.BizGoodsCategory">
+		update biz_goods_category
+		<set>
+			<if test="categoryName != null">
+				category_name = #{categoryName,jdbcType=VARCHAR},
+			</if>
+			<if test="categoryCode != null">
+				category_code = #{categoryCode,jdbcType=VARCHAR},
+			</if>
+			<if test="icon != null">
+				icon = #{icon,jdbcType=VARCHAR},
+			</if>
+			<if test="pid != null">
+				pid = #{pid,jdbcType=INTEGER},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createId != null">
+				create_id = #{createId,jdbcType=INTEGER},
+			</if>
+			<if test="modifyTime != null">
+				modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="modifyId != null">
+				modify_id = #{modifyId,jdbcType=INTEGER},
+			</if>
+			<if test="categoryDesc != null">
+				category_desc = #{categoryDesc,jdbcType=LONGVARCHAR},
+			</if>
+			<if test="appClientIcon != null">
+				app_client_icon = #{appClientIcon,jdbcType=VARCHAR},
+			</if>
+			<if test="tsort != null">
+				tsort = #{tsort,jdbcType=INTEGER},
+			</if>
+			<if test="categoryType != null">
+				category_type = #{categoryType,jdbcType=INTEGER},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKeyWithBLOBs" parameterType="com.quantum.engine.homy.model.BizGoodsCategory">
+		update biz_goods_category
+		set category_name = #{categoryName,jdbcType=VARCHAR},
+		category_code = #{categoryCode,jdbcType=VARCHAR},
+		icon = #{icon,jdbcType=VARCHAR},
+		pid = #{pid,jdbcType=INTEGER},
+		create_time = #{createTime,jdbcType=TIMESTAMP},
+		create_id = #{createId,jdbcType=INTEGER},
+		modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+		modify_id = #{modifyId,jdbcType=INTEGER},
+		category_desc = #{categoryDesc,jdbcType=LONGVARCHAR},
+		app_client_icon = #{appClientIcon,jdbcType=VARCHAR},
+		tsort = #{tsort,jdbcType=INTEGER},
+		category_type = #{categoryType,jdbcType=INTEGER}
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.quantum.engine.homy.model.BizGoodsCategory">
+		update biz_goods_category
+		set category_name = #{categoryName,jdbcType=VARCHAR},
+		category_code = #{categoryCode,jdbcType=VARCHAR},
+		icon = #{icon,jdbcType=VARCHAR},
+		pid = #{pid,jdbcType=INTEGER},
+		create_time = #{createTime,jdbcType=TIMESTAMP},
+		create_id = #{createId,jdbcType=INTEGER},
+		modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+		modify_id = #{modifyId,jdbcType=INTEGER},
+		app_client_icon = #{appClientIcon,jdbcType=VARCHAR},
+		tsort = #{tsort,jdbcType=INTEGER},
+		category_type = #{categoryType,jdbcType=INTEGER}
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+</mapper>

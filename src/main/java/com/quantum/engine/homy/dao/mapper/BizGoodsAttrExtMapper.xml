@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quantum.engine.homy.dao.BizGoodsAttrExtMapper">
+	<!-- <cache type="org.mybatis.caches.ehcache.LoggingEhcache" /> -->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+	<resultMap id="BaseResultMap" type="com.quantum.engine.homy.model.BizGoodsAttrExt">
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="goods_id" jdbcType="INTEGER" property="goodsId" />
+		<result column="attr_name" jdbcType="VARCHAR" property="attrName" />
+		<result column="attr_value" jdbcType="VARCHAR" property="attrValue" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, goods_id, attr_name, attr_value
+	</sql>
+	<select id="selectByPrimaryKey" parameterType="java.lang.Integer"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from biz_goods_attr_ext
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+	
+	<select id="getAttrsByGoodsId" parameterType="java.lang.Integer" resultType="com.quantum.engine.homy.model.result.Option">
+		select id, attr_name as attrKey,attr_value as attrVal from biz_goods_attr_ext
+		where goods_id = #{goodsId,jdbcType=INTEGER}
+	</select>
+	
+	<delete id="deleteByGoodsId" parameterType="java.lang.Integer">
+		delete from biz_goods_attr_ext
+		where goods_id = #{goodsId,jdbcType=INTEGER}
+	</delete>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from biz_goods_attr_ext
+		where id = #{id,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.quantum.engine.homy.model.BizGoodsAttrExt">
+		insert into biz_goods_attr_ext (id, goods_id, attr_name,
+		attr_value)
+		values (#{id,jdbcType=INTEGER}, #{goodsId,jdbcType=INTEGER},
+		#{attrName,jdbcType=VARCHAR},
+		#{attrValue,jdbcType=VARCHAR})
+	</insert>
+	<insert id="insertSelective" parameterType="com.quantum.engine.homy.model.BizGoodsAttrExt">
+		insert into biz_goods_attr_ext
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="goodsId != null">
+				goods_id,
+			</if>
+			<if test="attrName != null">
+				attr_name,
+			</if>
+			<if test="attrValue != null">
+				attr_value,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="goodsId != null">
+				#{goodsId,jdbcType=INTEGER},
+			</if>
+			<if test="attrName != null">
+				#{attrName,jdbcType=VARCHAR},
+			</if>
+			<if test="attrValue != null">
+				#{attrValue,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.quantum.engine.homy.model.BizGoodsAttrExt">
+		update biz_goods_attr_ext
+		<set>
+			<if test="goodsId != null">
+				goods_id = #{goodsId,jdbcType=INTEGER},
+			</if>
+			<if test="attrName != null">
+				attr_name = #{attrName,jdbcType=VARCHAR},
+			</if>
+			<if test="attrValue != null">
+				attr_value = #{attrValue,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.quantum.engine.homy.model.BizGoodsAttrExt">
+		update biz_goods_attr_ext
+		set goods_id = #{goodsId,jdbcType=INTEGER},
+		attr_name = #{attrName,jdbcType=VARCHAR},
+		attr_value = #{attrValue,jdbcType=VARCHAR}
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+</mapper>

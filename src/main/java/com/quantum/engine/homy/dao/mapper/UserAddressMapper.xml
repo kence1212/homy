@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quantum.engine.homy.dao.UserAddressMapper">
+  <resultMap id="BaseResultMap" type="com.quantum.engine.homy.model.UserAddress">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="consignee" jdbcType="VARCHAR" property="consignee" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="province_id" jdbcType="INTEGER" property="provinceId" />
+    <result column="city_id" jdbcType="INTEGER" property="cityId" />
+    <result column="area_id" jdbcType="INTEGER" property="areaId" />
+    <result column="address_detail" jdbcType="VARCHAR" property="addressDetail" />
+    <result column="is_default" jdbcType="SMALLINT" property="isDefault" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+   <resultMap  id="BaseResultWithNameMap" type="com.quantum.engine.homy.model.ext.UserAddressExt">
+   	<result property="id" column="id" />
+	<result property="consignee" column="consignee" />
+	<result property="phone" column="phone" />
+	<result property="addressDetail" column="address_detail" />
+	<result property="isDefault" column="is_default" />
+	<result property="userId" column="userId" />
+    <association property="provinceName" column="province_id" select="com.quantum.engine.homy.dao.BasRegionMapper.getNameById"></association>
+    <association property="cityName" column="city_id" select="com.quantum.engine.homy.dao.BasRegionMapper.getNameById"></association>
+    <association property="areaName" column="area_id" select="com.quantum.engine.homy.dao.BasRegionMapper.getNameById"></association>
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    id, consignee, phone, province_id, city_id, area_id, address_detail, is_default, 
+    user_id, create_time
+  </sql>
+  
+  <select id="getAddrExt" parameterType="java.lang.Integer" resultMap="BaseResultWithNameMap">
+    select 
+    <include refid="Base_Column_List" />
+    from biz_user_address
+    where id = #{addressId,jdbcType=INTEGER}
+  </select>
+  <select id="getDefaultAddrExt" parameterType="java.lang.Integer" resultMap="BaseResultWithNameMap">
+    select 
+    <include refid="Base_Column_List" />
+    from biz_user_address
+    where user_id = #{userId,jdbcType=INTEGER} and is_default = 1
+  </select>
+  <select id="getDefaultAddr" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from biz_user_address
+    where user_id = #{userId,jdbcType=INTEGER} and is_default = 1
+  </select>
+  
+  <select id="selectByUserId" parameterType="java.lang.Integer" resultType="java.lang.Integer" >
+    select count(*)
+    from biz_user_address
+    where user_id = #{userId,jdbcType=INTEGER}
+  </select>
+  
+  <select id="getTotalCount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+    select 
+    count(*)
+    from biz_user_address
+    where user_id = #{userId,jdbcType=INTEGER}
+  </select>
+  
+  <select id="getUserAddrList"  resultMap="BaseResultWithNameMap">
+    select 
+    <include refid="Base_Column_List" />
+    from biz_user_address
+    where user_id = #{userId,jdbcType=INTEGER}
+    order by create_time desc
+    <if test="page>0">
+    	limit #{startIndex},#{pageSize}
+    </if>
+  </select>
+  
+  <select id="selectByUserIdAndCreateTime" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from biz_user_address
+    where user_id = #{userId,jdbcType=INTEGER}
+    order by create_time desc
+    limit 0,1
+  </select>
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from biz_user_address
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  
+  <delete id="deleteByDelIdAndUserId" >
+    delete from biz_user_address
+    where id = #{delId,jdbcType=INTEGER} and user_id= #{userId,jdbcType=INTEGER}
+  </delete>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from biz_user_address
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.quantum.engine.homy.model.UserAddress">
+    insert into biz_user_address (id, consignee, phone, 
+      province_id, city_id, area_id, 
+      address_detail, is_default, user_id, 
+      create_time)
+    values (#{id,jdbcType=INTEGER}, #{consignee,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, 
+      #{provinceId,jdbcType=INTEGER}, #{cityId,jdbcType=INTEGER}, #{areaId,jdbcType=INTEGER}, 
+      #{addressDetail,jdbcType=VARCHAR}, #{isDefault,jdbcType=SMALLINT}, #{userId,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.quantum.engine.homy.model.UserAddress">
+    insert into biz_user_address
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="consignee != null">
+        consignee,
+      </if>
+      <if test="phone != null">
+        phone,
+      </if>
+      <if test="provinceId != null">
+        province_id,
+      </if>
+      <if test="cityId != null">
+        city_id,
+      </if>
+      <if test="areaId != null">
+        area_id,
+      </if>
+      <if test="addressDetail != null">
+        address_detail,
+      </if>
+      <if test="isDefault != null">
+        is_default,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="consignee != null">
+        #{consignee,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="provinceId != null">
+        #{provinceId,jdbcType=INTEGER},
+      </if>
+      <if test="cityId != null">
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="areaId != null">
+        #{areaId,jdbcType=INTEGER},
+      </if>
+      <if test="addressDetail != null">
+        #{addressDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="isDefault != null">
+        #{isDefault,jdbcType=SMALLINT},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.quantum.engine.homy.model.UserAddress">
+    update biz_user_address
+    <set>
+      <if test="consignee != null">
+        consignee = #{consignee,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="provinceId != null">
+        province_id = #{provinceId,jdbcType=INTEGER},
+      </if>
+      <if test="cityId != null">
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="areaId != null">
+        area_id = #{areaId,jdbcType=INTEGER},
+      </if>
+      <if test="addressDetail != null">
+        address_detail = #{addressDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="isDefault != null">
+        is_default = #{isDefault,jdbcType=SMALLINT},
+      </if>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.quantum.engine.homy.model.UserAddress">
+    update biz_user_address
+    set consignee = #{consignee,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      province_id = #{provinceId,jdbcType=INTEGER},
+      city_id = #{cityId,jdbcType=INTEGER},
+      area_id = #{areaId,jdbcType=INTEGER},
+      address_detail = #{addressDetail,jdbcType=VARCHAR},
+      is_default = #{isDefault,jdbcType=SMALLINT},
+      user_id = #{userId,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+   <update id="updateByUserId" parameterType="java.lang.Integer">
+    update biz_user_address
+    set
+      is_default = 0
+    where user_id = #{userId,jdbcType=INTEGER}
+  </update>
+   <update id="setDefaultAddrById" parameterType="java.lang.Integer">
+    update biz_user_address
+    set
+      is_default = 1
+    where id = #{addrId,jdbcType=INTEGER}
+  </update>
+</mapper>

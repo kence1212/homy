@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quantum.engine.homy.dao.BizGoodsSizeMapper">
+	<!-- <cache type="org.mybatis.caches.ehcache.LoggingEhcache" /> -->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+	<resultMap id="BaseResultMap" type="com.quantum.engine.homy.model.BizGoodsSize">
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="goods_id" jdbcType="INTEGER" property="goodsId" />
+		<result column="name" jdbcType="VARCHAR" property="name" />
+		<result column="is_valid" jdbcType="SMALLINT" property="isValid" />
+		<result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="create_id" jdbcType="INTEGER" property="createId" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, goods_id, name, is_valid, create_time, create_id
+	</sql>
+	
+	<select id="getSizeById" parameterType="java.lang.Integer"
+		resultType="java.util.Map">
+		select id,name
+		from biz_goods_size
+		where goods_id = #{goodsId,jdbcType=INTEGER}
+	</select>
+	
+	<select id="getByGoodsIdAndName" resultMap="BaseResultMap">
+		select 
+		<include refid="Base_Column_List" />
+		from biz_goods_size
+		where goods_id = #{goodsId} and name=#{name}
+	</select>
+	<select id="selectByPrimaryKey" parameterType="java.lang.Integer"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from biz_goods_size
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByGoodsId" parameterType="java.lang.Integer">
+		delete from biz_goods_size
+		where goods_id = #{goodsId,jdbcType=INTEGER}
+	</delete>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from biz_goods_size
+		where id = #{id,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.quantum.engine.homy.model.BizGoodsSize" keyProperty="id"
+		useGeneratedKeys="true">
+		insert into biz_goods_size ( goods_id, name,
+		is_valid, create_time, create_id
+		)
+		values ( #{goodsId,jdbcType=INTEGER},
+		#{name,jdbcType=VARCHAR},
+		#{isValid,jdbcType=SMALLINT}, #{createTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=INTEGER}
+		)
+	</insert>
+	<insert id="insertSelective" parameterType="com.quantum.engine.homy.model.BizGoodsSize" keyProperty="id"
+		useGeneratedKeys="true">
+		insert into biz_goods_size
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="goodsId != null">
+				goods_id,
+			</if>
+			<if test="name != null">
+				name,
+			</if>
+			<if test="isValid != null">
+				is_valid,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="createId != null">
+				create_id,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="goodsId != null">
+				#{goodsId,jdbcType=INTEGER},
+			</if>
+			<if test="name != null">
+				#{name,jdbcType=VARCHAR},
+			</if>
+			<if test="isValid != null">
+				#{isValid,jdbcType=SMALLINT},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createId != null">
+				#{createId,jdbcType=INTEGER},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.quantum.engine.homy.model.BizGoodsSize">
+		update biz_goods_size
+		<set>
+			<if test="goodsId != null">
+				goods_id = #{goodsId,jdbcType=INTEGER},
+			</if>
+			<if test="name != null">
+				name = #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="isValid != null">
+				is_valid = #{isValid,jdbcType=SMALLINT},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createId != null">
+				create_id = #{createId,jdbcType=INTEGER},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.quantum.engine.homy.model.BizGoodsSize">
+		update biz_goods_size
+		set goods_id = #{goodsId,jdbcType=INTEGER},
+		name = #{name,jdbcType=VARCHAR},
+		is_valid = #{isValid,jdbcType=SMALLINT},
+		create_time = #{createTime,jdbcType=TIMESTAMP},
+		create_id = #{createId,jdbcType=INTEGER}
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+</mapper>

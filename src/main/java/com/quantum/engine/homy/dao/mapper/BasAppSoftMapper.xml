@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quantum.engine.homy.dao.BasAppSoftMapper">
+  <resultMap id="BaseResultMap" type="com.quantum.engine.homy.model.BasAppSoft">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="app_code" jdbcType="VARCHAR" property="appCode" />
+    <result column="app_version" jdbcType="INTEGER" property="appVersion" />
+    <result column="app_version_str" jdbcType="VARCHAR" property="appVersionStr" />
+    <result column="app_type" jdbcType="INTEGER" property="appType" />
+    <result column="compel_update" jdbcType="SMALLINT" property="compelUpdate" />
+    <result column="create_id" jdbcType="INTEGER" property="createId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="download_url" jdbcType="VARCHAR" property="downloadUrl" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.quantum.engine.homy.model.BasAppSoft">
+    <result column="app_info" jdbcType="LONGVARCHAR" property="appInfo" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, app_code, app_version, app_version_str, app_type, compel_update, create_id, create_time , download_url
+  </sql>
+  <sql id="Blob_Column_List">
+    app_info
+  </sql>
+  
+  <select id="getAll" resultMap="ResultMapWithBLOBs">
+  	select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from bas_app_soft
+  </select>
+  
+  <select id="selectMaxVersion" resultMap="ResultMapWithBLOBs" parameterType="com.quantum.engine.homy.model.BasAppSoft" >
+  	select 
+  	<include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from bas_app_soft where
+		app_version = (select max(app_version) from bas_app_soft where app_code = #{appCode} and app_type = #{appType})
+		and	app_code = #{appCode} and app_type = #{appType}
+  </select>
+  
+  <select id="selectByCodeAndVersionAndType"  resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from bas_app_soft
+    where app_code = #{appCode} and app_version = #{appVersion} and app_type = #{appType}
+  </select>
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from bas_app_soft
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from bas_app_soft
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.quantum.engine.homy.model.BasAppSoft">
+    insert into bas_app_soft (id, app_code, app_version, 
+      app_version_str, app_type, compel_update, 
+      create_id, create_time, app_info , download_url
+      )
+    values (#{id,jdbcType=INTEGER}, #{appCode,jdbcType=VARCHAR}, #{appVersion,jdbcType=INTEGER}, 
+      #{appVersionStr,jdbcType=VARCHAR}, #{appType,jdbcType=INTEGER}, #{compelUpdate,jdbcType=SMALLINT}, 
+      #{createId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{appInfo,jdbcType=LONGVARCHAR} ,
+      #{downloadUrl,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.quantum.engine.homy.model.BasAppSoft">
+    insert into bas_app_soft
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="appCode != null">
+        app_code,
+      </if>
+      <if test="appVersion != null">
+        app_version,
+      </if>
+      <if test="appVersionStr != null">
+        app_version_str,
+      </if>
+      <if test="appType != null">
+        app_type,
+      </if>
+      <if test="compelUpdate != null">
+        compel_update,
+      </if>
+      <if test="createId != null">
+        create_id,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="appInfo != null">
+        app_info,
+      </if>
+      <if test="downloadUrl != null">
+        download_url,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="appCode != null">
+        #{appCode,jdbcType=VARCHAR},
+      </if>
+      <if test="appVersion != null">
+        #{appVersion,jdbcType=INTEGER},
+      </if>
+      <if test="appVersionStr != null">
+        #{appVersionStr,jdbcType=VARCHAR},
+      </if>
+      <if test="appType != null">
+        #{appType,jdbcType=INTEGER},
+      </if>
+      <if test="compelUpdate != null">
+        #{compelUpdate,jdbcType=SMALLINT},
+      </if>
+      <if test="createId != null">
+        #{createId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="appInfo != null">
+        #{appInfo,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="downloadUrl != null">
+        #{downloadUrl,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.quantum.engine.homy.model.BasAppSoft">
+    update bas_app_soft
+    <set>
+      <if test="appCode != null">
+        app_code = #{appCode,jdbcType=VARCHAR},
+      </if>
+      <if test="appVersion != null">
+        app_version = #{appVersion,jdbcType=INTEGER},
+      </if>
+      <if test="appVersionStr != null">
+        app_version_str = #{appVersionStr,jdbcType=VARCHAR},
+      </if>
+      <if test="appType != null">
+        app_type = #{appType,jdbcType=INTEGER},
+      </if>
+      <if test="compelUpdate != null">
+        compel_update = #{compelUpdate,jdbcType=SMALLINT},
+      </if>
+      <if test="createId != null">
+        create_id = #{createId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="appInfo != null">
+        app_info = #{appInfo,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.quantum.engine.homy.model.BasAppSoft">
+    update bas_app_soft
+    set app_code = #{appCode,jdbcType=VARCHAR},
+      app_version = #{appVersion,jdbcType=INTEGER},
+      app_version_str = #{appVersionStr,jdbcType=VARCHAR},
+      app_type = #{appType,jdbcType=INTEGER},
+      compel_update = #{compelUpdate,jdbcType=SMALLINT},
+      create_id = #{createId,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      app_info = #{appInfo,jdbcType=LONGVARCHAR},
+      download_url = #{downloadUrl,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.quantum.engine.homy.model.BasAppSoft">
+    update bas_app_soft
+    set app_code = #{appCode,jdbcType=VARCHAR},
+      app_version = #{appVersion,jdbcType=INTEGER},
+      app_version_str = #{appVersionStr,jdbcType=VARCHAR},
+      app_type = #{appType,jdbcType=INTEGER},
+      compel_update = #{compelUpdate,jdbcType=SMALLINT},
+      create_id = #{createId,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},download_url = #{downloadUrl,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

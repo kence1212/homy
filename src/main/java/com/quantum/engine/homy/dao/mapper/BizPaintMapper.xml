@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quantum.engine.homy.dao.BizPaintMapper">
+	<!-- <cache type="org.mybatis.caches.ehcache.LoggingEhcache" /> -->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+	<resultMap id="BaseResultMap" type="com.quantum.engine.homy.model.BizPaint">
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="paint_name" jdbcType="VARCHAR" property="paintName" />
+		<result column="paint_code" jdbcType="VARCHAR" property="paintCode" />
+		<result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="create_id" jdbcType="INTEGER" property="createId" />
+		<result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+		<result column="modfiy_id" jdbcType="INTEGER" property="modfiyId" />
+	</resultMap>
+	<resultMap extends="BaseResultMap" id="ResultMapWithBLOBs"
+		type="com.quantum.engine.homy.model.BizPaint">
+		<result column="paint_desc" jdbcType="LONGVARCHAR" property="paintDesc" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, paint_name, paint_code, create_time, create_id, modify_time,
+		modfiy_id
+	</sql>
+	<sql id="Blob_Column_List">
+		paint_desc
+	</sql>
+	<select id="getAll" resultMap="ResultMapWithBLOBs">
+		select
+		<include refid="Base_Column_List" />
+		,
+		<include refid="Blob_Column_List" />
+		from biz_paint
+	</select>
+
+	<select id="selectByPrimaryKey" parameterType="java.lang.Integer"
+		resultMap="ResultMapWithBLOBs">
+		select
+		<include refid="Base_Column_List" />
+		,
+		<include refid="Blob_Column_List" />
+		from biz_paint
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from biz_paint
+		where id = #{id,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.quantum.engine.homy.model.BizPaint">
+		insert into biz_paint (id, paint_name, paint_code,
+		create_time, create_id, modify_time,
+		modfiy_id, paint_desc)
+		values (#{id,jdbcType=INTEGER}, #{paintName,jdbcType=VARCHAR},
+		#{paintCode,jdbcType=VARCHAR},
+		#{createTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=INTEGER}, #{modifyTime,jdbcType=TIMESTAMP},
+		#{modfiyId,jdbcType=INTEGER}, #{paintDesc,jdbcType=LONGVARCHAR})
+	</insert>
+	<insert id="insertSelective" parameterType="com.quantum.engine.homy.model.BizPaint">
+		insert into biz_paint
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="paintName != null">
+				paint_name,
+			</if>
+			<if test="paintCode != null">
+				paint_code,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="createId != null">
+				create_id,
+			</if>
+			<if test="modifyTime != null">
+				modify_time,
+			</if>
+			<if test="modfiyId != null">
+				modfiy_id,
+			</if>
+			<if test="paintDesc != null">
+				paint_desc,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="paintName != null">
+				#{paintName,jdbcType=VARCHAR},
+			</if>
+			<if test="paintCode != null">
+				#{paintCode,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createId != null">
+				#{createId,jdbcType=INTEGER},
+			</if>
+			<if test="modifyTime != null">
+				#{modifyTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="modfiyId != null">
+				#{modfiyId,jdbcType=INTEGER},
+			</if>
+			<if test="paintDesc != null">
+				#{paintDesc,jdbcType=LONGVARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.quantum.engine.homy.model.BizPaint">
+		update biz_paint
+		<set>
+			<if test="paintName != null">
+				paint_name = #{paintName,jdbcType=VARCHAR},
+			</if>
+			<if test="paintCode != null">
+				paint_code = #{paintCode,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createId != null">
+				create_id = #{createId,jdbcType=INTEGER},
+			</if>
+			<if test="modifyTime != null">
+				modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="modfiyId != null">
+				modfiy_id = #{modfiyId,jdbcType=INTEGER},
+			</if>
+			<if test="paintDesc != null">
+				paint_desc = #{paintDesc,jdbcType=LONGVARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKeyWithBLOBs" parameterType="com.quantum.engine.homy.model.BizPaint">
+		update biz_paint
+		set paint_name = #{paintName,jdbcType=VARCHAR},
+		paint_code = #{paintCode,jdbcType=VARCHAR},
+		create_time = #{createTime,jdbcType=TIMESTAMP},
+		create_id = #{createId,jdbcType=INTEGER},
+		modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+		modfiy_id = #{modfiyId,jdbcType=INTEGER},
+		paint_desc = #{paintDesc,jdbcType=LONGVARCHAR}
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.quantum.engine.homy.model.BizPaint">
+		update biz_paint
+		set paint_name = #{paintName,jdbcType=VARCHAR},
+		paint_code = #{paintCode,jdbcType=VARCHAR},
+		create_time = #{createTime,jdbcType=TIMESTAMP},
+		create_id = #{createId,jdbcType=INTEGER},
+		modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+		modfiy_id = #{modfiyId,jdbcType=INTEGER}
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+</mapper>

@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quantum.engine.homy.dao.BizStoreMapper">
+	<!-- <cache type="org.mybatis.caches.ehcache.LoggingEhcache" /> -->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+	<resultMap id="BaseResultMap" type="com.quantum.engine.homy.model.BizStore">
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="store_name" jdbcType="VARCHAR" property="storeName" />
+		<result column="store_no" jdbcType="VARCHAR" property="storeNo" />
+		<result column="user_id" jdbcType="INTEGER" property="userId" />
+		<result column="store_icon" jdbcType="VARCHAR" property="storeIcon" />
+		<result column="store_state" jdbcType="SMALLINT" property="storeState" />
+		<result column="store_grade" jdbcType="SMALLINT" property="storeGrade" />
+		<result column="create_id" jdbcType="INTEGER" property="createId" />
+		<result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="modify_id" jdbcType="INTEGER" property="modifyId" />
+		<result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+	</resultMap>
+	<resultMap extends="BaseResultMap" id="ResultMapWithBLOBs"
+		type="com.quantum.engine.homy.model.BizStore">
+		<result column="store_desc" jdbcType="LONGVARCHAR" property="storeDesc" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, store_name, store_no, user_id, store_icon, store_state, store_grade,
+		create_id,
+		create_time, modify_id, modify_time
+	</sql>
+	<sql id="Blob_Column_List">
+		store_desc
+	</sql>
+	<select id="listAll" resultMap="ResultMapWithBLOBs">
+		select
+		<include refid="Base_Column_List" />
+		,
+		<include refid="Blob_Column_List" />
+		from biz_store
+	</select>
+	<select id="selectByPrimaryKey" parameterType="java.lang.Integer"
+		resultMap="ResultMapWithBLOBs">
+		select
+		<include refid="Base_Column_List" />
+		,
+		<include refid="Blob_Column_List" />
+		from biz_store
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from biz_store
+		where id = #{id,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.quantum.engine.homy.model.BizStore">
+		insert into biz_store (id, store_name, store_no,
+		user_id, store_icon, store_state,
+		store_grade, create_id, create_time,
+		modify_id, modify_time, store_desc
+		)
+		values (#{id,jdbcType=INTEGER}, #{storeName,jdbcType=VARCHAR},
+		#{storeNo,jdbcType=VARCHAR},
+		#{userId,jdbcType=INTEGER}, #{storeIcon,jdbcType=VARCHAR}, #{storeState,jdbcType=SMALLINT},
+		#{storeGrade,jdbcType=SMALLINT}, #{createId,jdbcType=INTEGER},
+		#{createTime,jdbcType=TIMESTAMP},
+		#{modifyId,jdbcType=INTEGER}, #{modifyTime,jdbcType=TIMESTAMP}, #{storeDesc,jdbcType=LONGVARCHAR}
+		)
+	</insert>
+	<insert id="insertSelective" parameterType="com.quantum.engine.homy.model.BizStore">
+		insert into biz_store
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="storeName != null">
+				store_name,
+			</if>
+			<if test="storeNo != null">
+				store_no,
+			</if>
+			<if test="userId != null">
+				user_id,
+			</if>
+			<if test="storeIcon != null">
+				store_icon,
+			</if>
+			<if test="storeState != null">
+				store_state,
+			</if>
+			<if test="storeGrade != null">
+				store_grade,
+			</if>
+			<if test="createId != null">
+				create_id,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="modifyId != null">
+				modify_id,
+			</if>
+			<if test="modifyTime != null">
+				modify_time,
+			</if>
+			<if test="storeDesc != null">
+				store_desc,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="storeName != null">
+				#{storeName,jdbcType=VARCHAR},
+			</if>
+			<if test="storeNo != null">
+				#{storeNo,jdbcType=VARCHAR},
+			</if>
+			<if test="userId != null">
+				#{userId,jdbcType=INTEGER},
+			</if>
+			<if test="storeIcon != null">
+				#{storeIcon,jdbcType=VARCHAR},
+			</if>
+			<if test="storeState != null">
+				#{storeState,jdbcType=SMALLINT},
+			</if>
+			<if test="storeGrade != null">
+				#{storeGrade,jdbcType=SMALLINT},
+			</if>
+			<if test="createId != null">
+				#{createId,jdbcType=INTEGER},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="modifyId != null">
+				#{modifyId,jdbcType=INTEGER},
+			</if>
+			<if test="modifyTime != null">
+				#{modifyTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="storeDesc != null">
+				#{storeDesc,jdbcType=LONGVARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.quantum.engine.homy.model.BizStore">
+		update biz_store
+		<set>
+			<if test="storeName != null">
+				store_name = #{storeName,jdbcType=VARCHAR},
+			</if>
+			<if test="storeNo != null">
+				store_no = #{storeNo,jdbcType=VARCHAR},
+			</if>
+			<if test="userId != null">
+				user_id = #{userId,jdbcType=INTEGER},
+			</if>
+			<if test="storeIcon != null">
+				store_icon = #{storeIcon,jdbcType=VARCHAR},
+			</if>
+			<if test="storeState != null">
+				store_state = #{storeState,jdbcType=SMALLINT},
+			</if>
+			<if test="storeGrade != null">
+				store_grade = #{storeGrade,jdbcType=SMALLINT},
+			</if>
+			<if test="createId != null">
+				create_id = #{createId,jdbcType=INTEGER},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="modifyId != null">
+				modify_id = #{modifyId,jdbcType=INTEGER},
+			</if>
+			<if test="modifyTime != null">
+				modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="storeDesc != null">
+				store_desc = #{storeDesc,jdbcType=LONGVARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKeyWithBLOBs" parameterType="com.quantum.engine.homy.model.BizStore">
+		update biz_store
+		set store_name = #{storeName,jdbcType=VARCHAR},
+		store_no = #{storeNo,jdbcType=VARCHAR},
+		user_id = #{userId,jdbcType=INTEGER},
+		store_icon = #{storeIcon,jdbcType=VARCHAR},
+		store_state = #{storeState,jdbcType=SMALLINT},
+		store_grade = #{storeGrade,jdbcType=SMALLINT},
+		create_id = #{createId,jdbcType=INTEGER},
+		create_time = #{createTime,jdbcType=TIMESTAMP},
+		modify_id = #{modifyId,jdbcType=INTEGER},
+		modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+		store_desc = #{storeDesc,jdbcType=LONGVARCHAR}
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.quantum.engine.homy.model.BizStore">
+		update biz_store
+		set store_name = #{storeName,jdbcType=VARCHAR},
+		store_no = #{storeNo,jdbcType=VARCHAR},
+		user_id = #{userId,jdbcType=INTEGER},
+		store_icon = #{storeIcon,jdbcType=VARCHAR},
+		store_state = #{storeState,jdbcType=SMALLINT},
+		store_grade = #{storeGrade,jdbcType=SMALLINT},
+		create_id = #{createId,jdbcType=INTEGER},
+		create_time = #{createTime,jdbcType=TIMESTAMP},
+		modify_id = #{modifyId,jdbcType=INTEGER},
+		modify_time = #{modifyTime,jdbcType=TIMESTAMP}
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+</mapper>

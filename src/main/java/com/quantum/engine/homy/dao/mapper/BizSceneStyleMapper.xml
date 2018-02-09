@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quantum.engine.homy.dao.BizSceneStyleMapper">
+  <resultMap id="BaseResultMap" type="com.quantum.engine.homy.model.BizSceneStyle">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="icon" jdbcType="VARCHAR" property="icon" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="create_id" jdbcType="INTEGER" property="createId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="sort" jdbcType="INTEGER" property="sort" />
+    <result column="scene_desc" jdbcType="VARCHAR" property="sceneDesc" />
+    <result column="scene_category_id" jdbcType="INTEGER" property="sceneCategoryId" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.quantum.engine.homy.model.BizSceneStyle">
+    <result column="scene_info" jdbcType="LONGVARCHAR" property="sceneInfo" />
+  </resultMap>
+  <resultMap extends="ResultMapWithBLOBs" id="ResultMapWithCategoryName" type="com.quantum.engine.homy.model.ext.BizSceneStyleExt">
+    <result column="categoryName" jdbcType="VARCHAR" property="categoryName" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, title, icon, state, create_id, create_time, sort, scene_desc, scene_category_id
+  </sql>
+  <sql id="Blob_Column_List">
+    scene_info
+  </sql>
+  <sql id="Connect_Column_List">
+    s.id, s.title, s.icon, s.state, s.create_id, s.create_time, s.sort, s.scene_desc, s.scene_category_id, s.scene_info, c.name as categoryName
+  </sql>
+  <select id="getCountByCategoryId" resultType="java.lang.Integer">
+    select 
+   	count(*)
+    from biz_scene_style
+    where scene_category_id = #{sceneCategoryId}
+  </select>
+  <select id="getCount" resultType="java.lang.Integer">
+    select 
+   	count(*)
+    from biz_scene_style
+    <if test="keyword != null and keyword != ''">
+    	where title like #{keyword}
+    </if>
+  </select>
+  <select id="getStyleList"  resultMap="ResultMapWithCategoryName">
+    select 
+    <include refid="Connect_Column_List" />
+    from biz_scene_style s 
+    left join biz_scene_category c on c.id = s.scene_category_id
+    where state = 1
+    order by sort
+  </select>
+  <select id="getList"  resultMap="ResultMapWithCategoryName">
+    select 
+    <include refid="Connect_Column_List" />
+    from biz_scene_style s 
+    left join biz_scene_category c on c.id = s.scene_category_id
+    <if test="keyword != null and keyword != ''">
+    	where title like #{keyword}
+    </if>
+    order by create_time desc
+    <if test="page != null and page != 0">
+    	limit #{startIndex},#{pageSize}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from biz_scene_style
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from biz_scene_style
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.quantum.engine.homy.model.BizSceneStyle">
+    insert into biz_scene_style (id, title, icon, 
+      state, create_id, create_time, 
+      sort, scene_desc, scene_info, scene_category_id
+      )
+    values (#{id,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{icon,jdbcType=VARCHAR}, 
+      #{state,jdbcType=INTEGER}, #{createId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{sort,jdbcType=INTEGER}, #{sceneDesc,jdbcType=VARCHAR}, #{sceneInfo,jdbcType=LONGVARCHAR},  #{sceneCategoryId,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.quantum.engine.homy.model.BizSceneStyle">
+    insert into biz_scene_style
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="title != null">
+        title,
+      </if>
+      <if test="icon != null">
+        icon,
+      </if>
+      <if test="state != null">
+        state,
+      </if>
+      <if test="createId != null">
+        create_id,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="sort != null">
+        sort,
+      </if>
+      <if test="sceneDesc != null">
+        scene_desc,
+      </if>
+      <if test="sceneInfo != null">
+        scene_info,
+      </if>
+      <if test="sceneCategoryId != null">
+        scene_category_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="icon != null">
+        #{icon,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=INTEGER},
+      </if>
+      <if test="createId != null">
+        #{createId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sort != null">
+        #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="sceneDesc != null">
+        #{sceneDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="sceneInfo != null">
+        #{sceneInfo,jdbcType=LONGVARCHAR},
+      </if>
+       <if test="sceneCategoryId != null">
+        #{sceneCategoryId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.quantum.engine.homy.model.BizSceneStyle">
+    update biz_scene_style
+    <set>
+      <if test="title != null">
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="icon != null">
+        icon = #{icon,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        state = #{state,jdbcType=INTEGER},
+      </if>
+      <if test="createId != null">
+        create_id = #{createId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sort != null">
+        sort = #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="sceneDesc != null">
+        scene_desc = #{sceneDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="sceneInfo != null">
+        scene_info = #{sceneInfo,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="sceneCategoryId != null">
+        scene_category_id = #{sceneCategoryId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.quantum.engine.homy.model.BizSceneStyle">
+    update biz_scene_style
+    set title = #{title,jdbcType=VARCHAR},
+      icon = #{icon,jdbcType=VARCHAR},
+      state = #{state,jdbcType=INTEGER},
+      create_id = #{createId,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      sort = #{sort,jdbcType=INTEGER},
+      scene_desc = #{sceneDesc,jdbcType=VARCHAR},
+      scene_info = #{sceneInfo,jdbcType=LONGVARCHAR},
+      scene_category_id = #{sceneCategoryId,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.quantum.engine.homy.model.BizSceneStyle">
+    update biz_scene_style
+    set title = #{title,jdbcType=VARCHAR},
+      icon = #{icon,jdbcType=VARCHAR},
+      state = #{state,jdbcType=INTEGER},
+      create_id = #{createId,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      sort = #{sort,jdbcType=INTEGER},
+      scene_desc = #{sceneDesc,jdbcType=VARCHAR},
+      scene_category_id = #{sceneCategoryId,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.quantum.engine.homy.dao.UserTokenMapper">
+	<!-- <cache type="org.mybatis.caches.ehcache.LoggingEhcache" /> -->
+	<!-- <cache type="org.mybatis.caches.ehcache.EhcacheCache" /> -->
+
+	<resultMap type="UserToken" id="UserToken">
+		<id property="userId" column="user_id" javaType="int" />
+		<!-- 带下划线，需特殊处理 -->
+		<result property="token" column="token" javaType="string" />
+		<result property="modifyTime" column="modify_time" javaType="java.util.Date" />
+	</resultMap>
+
+	
+  <select id="getByTokenAndUserId" resultMap="UserToken">
+	SELECT * FROM biz_user_token
+	 WHERE token = #{token} and user_id = #{userId} 
+	and unix_timestamp(modify_time) > unix_timestamp(NOW())-86400*14 
+	ORDER BY modify_time DESC  LIMIT 0,1
+  </select>
+
+	<insert id="insert" parameterType="UserToken" keyProperty="userId">
+		insert into biz_user_token (user_id,token,modify_time)
+		values(#{userId},#{token},#{modifyTime})
+	</insert>
+
+	<select id="count" resultType="long" parameterType="java.util.Map">
+		select count(*) from biz_user_token where 1 = 1
+	</select>
+
+	<select id="getById" resultMap="UserToken" parameterType="int">
+		select * from biz_user_token where user_id = #{value}
+	</select>
+
+	<select id="getByToken" resultMap="UserToken" parameterType="string">
+		select * from biz_user_token where token = #{token}
+	</select>
+
+	<update id="update" parameterType="UserToken">
+		update biz_user_token set token=#{token} , modify_time = #{modifyTime}
+		where user_id = #{userId}
+	</update>
+
+	<delete id="delete" parameterType="int">
+		delete from biz_user_token where user_id=#{value}
+	</delete>
+
+</mapper>

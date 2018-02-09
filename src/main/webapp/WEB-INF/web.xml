@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app
+        xmlns="http://java.sun.com/xml/ns/javaee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+        version="3.0"
+        metadata-complete="false">
+	<!-- shiro -->
+	<!-- <listener>
+	   <listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
+	</listener> -->
+	<listener>
+		<listener-class>
+			org.springframework.web.context.ContextLoaderListener
+		</listener-class>
+	</listener>
+	
+	<filter>
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param> 
+	</filter>
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>*.html</url-pattern>
+	</filter-mapping>
+	
+    <!-- <filter>
+        <filter-name>adminfilter</filter-name>
+        <filter-class>com.qj.qworld.filter.AdminFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>adminfilter</filter-name>
+        <url-pattern>/m/*</url-pattern>
+    </filter-mapping>  -->
+	<!-- <filter>
+        <filter-name>personalfilter</filter-name>
+        <filter-class>com.qj.qworld.filter.PersonalFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>personalfilter</filter-name>
+        <url-pattern>/personal/*</url-pattern>
+    </filter-mapping>  -->
+	
+	<context-param>
+	    <param-name>contextConfigLocation</param-name>
+	    <param-value>
+			/WEB-INF/config/applicationContext.xml
+			/WEB-INF/config/applicationContext-dao.xml
+			/WEB-INF/config/applicationContext-timer.xml
+		</param-value>
+	</context-param> 
+	<context-param>
+		<param-name>path</param-name>
+		<param-value>/jiami</param-value>
+	</context-param>
+	
+	<!-- plUpload上传 -->
+    <servlet>
+        <servlet-name>PlUpload</servlet-name>
+        <servlet-class>com.quantum.engine.homy.util.PlUploadServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PlUpload</servlet-name>
+        <url-pattern>/plupload</url-pattern>
+    </servlet-mapping>
+	
+	<!-- 图片压缩 -->
+    <servlet>
+        <servlet-name>PlUploadScale</servlet-name>
+        <servlet-class>com.quantum.engine.homy.util.PlUploadScaleServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PlUploadScale</servlet-name>
+        <url-pattern>/pluploadscale</url-pattern>
+    </servlet-mapping>
+	
+	<servlet>
+		<servlet-name>homy</servlet-name>
+		<servlet-class>
+			org.springframework.web.servlet.DispatcherServlet
+		</servlet-class>
+        <load-on-startup>1</load-on-startup>
+        <async-supported>true</async-supported>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>homy</servlet-name>
+		<url-pattern>*.html</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>homy</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+	
+	<filter>
+        <filter-name>adminfilter</filter-name>
+        <filter-class>com.quantum.engine.homy.filter.AdminFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>adminfilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping> 
+	
+	<!-- session过期时间 -->
+	<session-config>
+		<session-timeout>30</session-timeout>
+	</session-config>
+	
+	<!-- <error-page>
+	   <error-code>404</error-code>
+	   <location>/404.html</location>
+	</error-page>
+	
+	<error-page>
+       <error-code>500</error-code>
+       <location>/500.html</location>
+    </error-page> -->
+	
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+</web-app>

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.quantum.engine.homy.dao.UserMapper">
+	<!-- <cache type="org.mybatis.caches.ehcache.LoggingEhcache" /> -->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+
+	<resultMap type="User" id="User">
+		<id property="userId" column="user_id" javaType="int" />
+		<!-- 带下划线，需特殊处理 -->
+		<result property="phone" column="phone" javaType="string" />
+		<result property="password" column="password" javaType="string" />
+		<result property="salt" column="salt" javaType="string" />
+		<result property="username" column="username" javaType="string" />
+		<result property="portrait" column="portrait" javaType="string" />
+		<result property="phoneCode" column="phone_code" javaType="string" />
+		<result property="registerTime" column="register_time"
+			javaType="java.util.Date" />
+		<result property="registerIp" column="register_ip" javaType="string" />
+		<result property="registerClient" column="register_client"
+			javaType="int" />
+		<result property="sex" column="sex" javaType="int" />
+		<result property="nickname" column="nickname" javaType="string" />
+		<result property="email" column="email" javaType="string" />
+		<result property="grade" column="grade" javaType="int" />
+		<result property="userState" column="user_state" javaType="int" />
+		<result property="company" column="company" javaType="string" />
+		<result property="companyAddr" column="company_addr" javaType="string" />
+		<result property="job" column="job" javaType="string" />
+	</resultMap>
+	
+	<resultMap extends="User" id="BizUserCompany" type="com.quantum.engine.homy.model.BizUserCompany">
+	    <result column="operating_projects" jdbcType="VARCHAR" property="operatingProjects" />
+	    <result column="employee_num" jdbcType="VARCHAR" property="employeeNum" />
+	    <result column="operating_years" jdbcType="INTEGER" property="operatingYears" />
+	    <result column="company_phone" jdbcType="VARCHAR" property="companyPhone" />
+	    <result column="remark" jdbcType="VARCHAR" property="remark" />
+	</resultMap>
+
+	<insert id="insert" parameterType="User" keyProperty="userId"
+		useGeneratedKeys="true">
+		insert into biz_user
+		(phone,password,salt,username,portrait,phone_code,register_time
+		,register_ip,register_client,email,grade,user_state,company,company_addr,job,sex,nickname)
+		values(#{phone},#{password},#{salt},#{username},#{portrait},#{phoneCode},#{registerTime}
+		,#{registerIp},#{registerClient},#{email},#{grade},#{userState},#{company},#{companyAddr},#{job},#{sex},#{nickname})
+	</insert>
+	
+	<insert id="insertUserCompany" parameterType="com.quantum.engine.homy.model.BizUserCompany">
+	    insert into biz_user_company (user_id, operating_projects, employee_num, 
+	      operating_years, company_phone, company_address, 
+	       remark)
+	    values (#{userId,jdbcType=INTEGER}, #{operatingProjects,jdbcType=VARCHAR}, #{employeeNum,jdbcType=VARCHAR}, 
+	      #{operatingYears,jdbcType=INTEGER}, #{companyPhone,jdbcType=VARCHAR}, #{companyAddress,jdbcType=VARCHAR}, 
+	       #{remark,jdbcType=VARCHAR})
+	</insert>
+	
+	<select id="getCompanyByUserId" resultMap="BizUserCompany" parameterType="int">
+		select * from biz_user bu
+		left join biz_user_company buc on buc.user_id = bu.user_id
+		where bu.user_id = #{userId}
+	</select>
+	
+	<select id="getOnlyExtByUserId" resultMap="BizUserCompany" parameterType="int">
+		select * from biz_user_company where user_id = #{userId}
+	</select>
+
+	<select id="getByUserId" resultMap="User" parameterType="int">
+		select * from biz_user where user_id = #{userId}
+	</select>
+	
+	<select id="getByPhone" resultMap="User" parameterType="string">
+		select * from biz_user where phone = #{value}
+	</select>
+	
+	<select id="getByUsername" resultMap="User" parameterType="string">
+		select * from biz_user where username = #{value}
+	</select>
+
+	<select id="list" resultMap="User" parameterType="java.util.Map">
+		select * from biz_user where 1 = 1
+		<if test="userState != null">
+			and user_state=#{userState}
+		</if>
+		<if test="searchKey != null">
+			and (phone like CONCAT(CONCAT('%', #{searchKey}), '%') or
+			username like CONCAT(CONCAT('%', #{searchKey}), '%') )
+		</if>
+		<if test="page != null">
+			limit #{page},#{rows}
+		</if>
+	</select>
+
+	<select id="count" resultType="long" parameterType="java.util.Map">
+		select count(*) from biz_user where 1 = 1
+	</select>
+
+	<select id="getById" resultMap="User" parameterType="int">
+		select * from biz_user where user_id = #{value}
+	</select>
+	
+	<select id="getByToken" resultMap="User" parameterType="string">
+		select * from biz_user where user_id = (select user_id from biz_user_token where token = #{value})
+	</select>
+
+	<update id="update" parameterType="User">
+		update biz_user set phone_code=#{phoneCode},password = #{password} , salt =
+		#{salt} , username = #{username}
+		,portrait=#{portrait} , register_time = #{registerTime} , register_ip = #{registerIp}
+		,register_client = #{registerClient} , email = #{email} , grade =
+		#{grade} , user_state = #{userState} , sex = #{sex} , nickname = #{nickname}
+		,job = #{job} , company = #{company} , company_addr = #{companyAddr}
+		where user_id = #{userId}
+	</update>
+	
+	<update id="updateCompany" parameterType="com.quantum.engine.homy.model.BizUserCompany">
+    update biz_user_company
+    set operating_projects = #{operatingProjects,jdbcType=VARCHAR},
+      employee_num = #{employeeNum,jdbcType=VARCHAR},
+      operating_years = #{operatingYears,jdbcType=INTEGER},
+      company_phone = #{companyPhone,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR}
+    where user_id = #{userId,jdbcType=INTEGER}
+  </update>
+  
+  <insert id="insertCompany" parameterType="com.quantum.engine.homy.model.BizUserCompany">
+    insert into biz_user_company (user_id, operating_projects, employee_num, 
+      operating_years, company_phone, 
+       remark)
+    values (#{userId,jdbcType=INTEGER}, #{operatingProjects,jdbcType=VARCHAR}, #{employeeNum,jdbcType=VARCHAR}, 
+      #{operatingYears,jdbcType=INTEGER}, #{companyPhone,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+
+	<update id="changePassword" parameterType="User">
+		update biz_user set salt=#{salt},password=#{password}
+		where user_id = #{userId}
+	</update>
+
+	<delete id="delete" parameterType="int">
+		delete from biz_user where user_id=#{value}
+	</delete>
+
+</mapper>

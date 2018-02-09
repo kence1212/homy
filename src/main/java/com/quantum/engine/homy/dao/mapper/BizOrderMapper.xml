@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quantum.engine.homy.dao.BizOrderMapper">
+  <resultMap id="BaseResultMap" type="com.quantum.engine.homy.model.BizOrder">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="total_price" jdbcType="DOUBLE" property="totalPrice" />
+    <result column="address_id" jdbcType="INTEGER" property="addressId" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="pay_type" jdbcType="INTEGER" property="payType" />
+    <result column="pay_time" jdbcType="TIMESTAMP" property="payTime" />
+    <result column="order_no" jdbcType="VARCHAR" property="orderNo" />
+    <result column="out_trade_no" jdbcType="VARCHAR" property="outTradeNo" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="postage" jdbcType="DOUBLE" property="postage" />
+    <result column="is_valid" jdbcType="INTEGER" property="isValid" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="BaseResultWithItemMap" type="com.quantum.engine.homy.model.ext.BizOrderExt">
+  	<association property="items" column="id" select="com.quantum.engine.homy.dao.BizOrderItemMapper.selectByOrderId"></association>
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="BaseResultWithUserNameMap" type="com.quantum.engine.homy.model.ext.BizOrderListExt">
+  		<result property="userName" column="username" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, user_id, total_price, address_id, state, create_time, pay_type, pay_time, order_no, 
+    out_trade_no, remark, postage, is_valid
+  </sql>
+  
+  <select id="getByOrderItemId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from biz_order
+    where id = (select order_id from biz_order_item where id = #{goodsItemId}) 
+    and is_valid = 1 
+  </select>
+  
+  <select id="getList" resultMap="BaseResultWithUserNameMap">
+  	select 
+  	 o.id, o.user_id, o.total_price, o.address_id, o.state, o.create_time, o.pay_type, o.pay_time, o.order_no, 
+    o.out_trade_no, o.remark, o.postage, o.is_valid, u.username
+  	from biz_order o
+  	left join biz_user u on o.user_id = u.user_id
+	<where>
+		<if test="orderNo != null and orderNo != ''">
+			and order_no like #{orderNo}
+		</if>
+		<if test="outTradeNo != null and outTradeNo != ''">
+			and out_trade_no like #{outTradeNo}
+		</if>
+		<if test="state != null">
+			and state =  #{state}
+		</if>
+	</where>
+	order by create_time desc
+	<if test="page != null">
+		limit #{startIndex},#{pageSize}
+	</if>
+  </select>
+  <select id="getTotalCount" resultType="java.lang.Integer">
+  	select count(*)
+  	from biz_order
+	<where>
+		<if test="orderNo != null and orderNo != ''">
+			and order_no like #{orderNo}
+		</if>
+		<if test="outTradeNo != null and outTradeNo != ''">
+			and out_trade_no like #{outTradeNo}
+		</if>
+		<if test="state != null">
+			and state =  #{state}
+		</if>
+	</where>
+  </select>
+  
+  <select id="getDetail"  resultMap="BaseResultWithItemMap">
+    select 
+    <include refid="Base_Column_List" />
+    from biz_order
+  	where id = #{id}
+  </select>
+  <select id="listOrder"  resultMap="BaseResultWithItemMap">
+    select 
+    <include refid="Base_Column_List" />
+    from biz_order
+    <where>
+    		and user_id = #{userId}
+    	<if test="orderIds != null">
+    		and id in 
+    		<foreach collection="orderIds" item="item" close=")" open="(" index="index" separator=",">
+    			#{item}
+    		</foreach>
+    	</if>
+    	<if test="stateList != null">
+    		and state in 
+    		<foreach collection="stateList" item="state" close=")" open="(" index="index" separator=",">
+    			#{state}
+    		</foreach>
+    	</if>
+    	and is_valid = 1
+    </where>
+  </select>
+  <select id="getCountByTno" parameterType="java.lang.String" resultType="java.lang.Integer">
+    select count(*)
+    from biz_order
+    where out_trade_no = #{genOrderTradeNo}
+  </select>
+  <select id="getCountByOno" parameterType="java.lang.String" resultType="java.lang.Integer">
+    select count(*)
+    from biz_order
+    where order_no = #{genOrderNo}
+  </select>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from biz_order
+    where id = #{id,jdbcType=INTEGER} and is_valid = 1 
+  </select>
+  <insert id="insert" parameterType="com.quantum.engine.homy.model.BizOrder" useGeneratedKeys="true" keyProperty="id">
+    insert into biz_order (id, user_id, total_price, 
+      address_id, state, create_time, 
+      pay_type, pay_time, order_no, 
+      out_trade_no, remark, postage, is_valid
+      )
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{totalPrice,jdbcType=DOUBLE}, 
+      #{addressId,jdbcType=INTEGER}, #{state,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{payType,jdbcType=INTEGER}, #{payTime,jdbcType=TIMESTAMP}, #{orderNo,jdbcType=VARCHAR}, 
+      #{outTradeNo,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{postage,jdbcType=DOUBLE}, #{isValid,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.quantum.engine.homy.model.BizOrder">
+    insert into biz_order
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="totalPrice != null">
+        total_price,
+      </if>
+      <if test="addressId != null">
+        address_id,
+      </if>
+      <if test="state != null">
+        state,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="payType != null">
+        pay_type,
+      </if>
+      <if test="payTime != null">
+        pay_time,
+      </if>
+      <if test="orderNo != null">
+        order_no,
+      </if>
+      <if test="outTradeNo != null">
+        out_trade_no,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="postage != null">
+        postage,
+      </if>
+      <if test="isValid != null">
+        is_valid,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="totalPrice != null">
+        #{totalPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="addressId != null">
+        #{addressId,jdbcType=INTEGER},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="payType != null">
+        #{payType,jdbcType=INTEGER},
+      </if>
+      <if test="payTime != null">
+        #{payTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orderNo != null">
+        #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="outTradeNo != null">
+        #{outTradeNo,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="postage != null">
+        #{postage,jdbcType=DOUBLE},
+      </if>
+      <if test="isValid != null">
+        #{isValid,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.quantum.engine.homy.model.BizOrder">
+    update biz_order
+    <set>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="totalPrice != null">
+        total_price = #{totalPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="addressId != null">
+        address_id = #{addressId,jdbcType=INTEGER},
+      </if>
+      <if test="state != null">
+        state = #{state,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="payType != null">
+        pay_type = #{payType,jdbcType=INTEGER},
+      </if>
+      <if test="payTime != null">
+        pay_time = #{payTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orderNo != null">
+        order_no = #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="outTradeNo != null">
+        out_trade_no = #{outTradeNo,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="postage != null">
+        postage = #{postage,jdbcType=DOUBLE},
+      </if>
+      <if test="isValid != null">
+       is_valid = #{isValid,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER} 
+  </update>
+  <update id="deleteOrder" >
+    update biz_order
+    set 
+      is_valid = 0
+    where id = #{id,jdbcType=INTEGER} and is_valid = 1 and user_id = #{userId}
+  </update>
+  <update id="setStateByUser" >
+    update biz_order
+    set 
+      state = #{state,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER} and is_valid = 1 and user_id = #{userId}
+  </update>
+  <update id="setState" >
+    update biz_order
+    set 
+      state = #{state,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER} and is_valid = 1
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.quantum.engine.homy.model.BizOrder">
+    update biz_order
+    set user_id = #{userId,jdbcType=INTEGER},
+      total_price = #{totalPrice,jdbcType=DOUBLE},
+      address_id = #{addressId,jdbcType=INTEGER},
+      state = #{state,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      pay_type = #{payType,jdbcType=INTEGER},
+      pay_time = #{payTime,jdbcType=TIMESTAMP},
+      order_no = #{orderNo,jdbcType=VARCHAR},
+      out_trade_no = #{outTradeNo,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      postage = #{postage,jdbcType=DOUBLE},
+      is_valid = #{isValid,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER} and is_valid = 1
+  </update>
+</mapper>

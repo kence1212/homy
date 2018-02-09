@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quantum.engine.homy.dao.BizShoppingCartMapper">
+  <resultMap id="BaseResultMap" type="com.quantum.engine.homy.model.BizShoppingCart">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="brand_id" jdbcType="INTEGER" property="brandId" />
+    <result column="goods_id" jdbcType="INTEGER" property="goodsId" />
+    <result column="goods_sku_id" jdbcType="INTEGER" property="goodsSkuId" />
+    <result column="num" jdbcType="INTEGER" property="num" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="is_valid" jdbcType="INTEGER" property="isValid" />
+    <result column="price" jdbcType="DOUBLE" property="price" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="BaseResultWithSkuMap" type="com.quantum.engine.homy.model.ext.BizShoppingCartWithSkuExt">
+    <result column="brandName" jdbcType="VARCHAR" property="brandName" />
+    <result column="stock" jdbcType="INTEGER" property="stock" />
+  	<association property="bizGoodsSku" column="goods_sku_id" select="com.quantum.engine.homy.dao.BizGoodsSkuMapper.getWithPropertiesNameById"></association>
+  </resultMap>
+  
+  
+  <sql id="Base_Column_List">
+    id, user_id, brand_id, goods_id, goods_sku_id, num, create_time, is_valid, price
+  </sql>
+  
+  <select id="getBySkuAndUserId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from biz_shopping_cart
+    where goods_sku_id = #{skuId,jdbcType=INTEGER} and is_valid = 1 and user_id = #{userId}
+  </select>
+  
+  
+  <select id="listShoppingCart" parameterType="java.lang.Integer" resultMap="BaseResultWithSkuMap">
+    select 
+    c.id, c.user_id, c.brand_id, c.goods_id, c.goods_sku_id, c.num, c.create_time, c.is_valid, b.brand_name as brandName, s.price, s.stock
+    from biz_shopping_cart c
+    left join bas_goods_brand b on c.brand_id = b.brand_id
+    left join biz_goods_sku_stock s on s.sku_id = c.goods_sku_id
+    where c.user_id = #{userId,jdbcType=INTEGER} and is_valid = 1 and s.city_id = #{cityId}
+    <if test="cartIds != null">
+    	and c.id in 
+    	<foreach collection="cartIds" index="index" item="item" close=")" open="(" separator=",">
+    		#{item}
+    	</foreach>
+    </if>
+  </select>
+  
+  <select id="listByIds" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from biz_shopping_cart
+    where is_valid = 1 and user_id = #{userId}
+    <if test="shoppingCartIds != null">
+     	and id in
+    	<foreach collection="shoppingCartIds" item="item" close=")" open="(" index="index" separator=",">
+    		#{item}
+    	</foreach>
+    </if>
+  </select>
+  
+ 
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from biz_shopping_cart
+    where id = #{id,jdbcType=INTEGER} and is_valid = 1
+  </select>
+  <insert id="insert" parameterType="com.quantum.engine.homy.model.BizShoppingCart" useGeneratedKeys="true" keyProperty="id">
+    insert into biz_shopping_cart (id, user_id, brand_id, 
+      goods_id, goods_sku_id, num, 
+      create_time, is_valid, price
+      )
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{brandId,jdbcType=INTEGER}, 
+      #{goodsId,jdbcType=INTEGER}, #{goodsSkuId,jdbcType=INTEGER}, #{num,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{isValid,jdbcType=INTEGER}, #{price,jdbcType=DOUBLE}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.quantum.engine.homy.model.BizShoppingCart">
+    insert into biz_shopping_cart
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="brandId != null">
+        brand_id,
+      </if>
+      <if test="goodsId != null">
+        goods_id,
+      </if>
+      <if test="goodsSkuId != null">
+        goods_sku_id,
+      </if>
+      <if test="num != null">
+        num,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="isValid != null">
+        is_valid,
+      </if>
+      <if test="price != null">
+        price,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="brandId != null">
+        #{brandId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsId != null">
+        #{goodsId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsSkuId != null">
+        #{goodsSkuId,jdbcType=INTEGER},
+      </if>
+      <if test="num != null">
+        #{num,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isValid != null">
+        #{isValid,jdbcType=INTEGER},
+      </if>
+      <if test="price != null">
+        #{price,jdbcType=DOUBLE},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.quantum.engine.homy.model.BizShoppingCart">
+    update biz_shopping_cart
+    <set>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="brandId != null">
+        brand_id = #{brandId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsId != null">
+        goods_id = #{goodsId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsSkuId != null">
+        goods_sku_id = #{goodsSkuId,jdbcType=INTEGER},
+      </if>
+      <if test="num != null">
+        num = #{num,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isValid != null">
+        is_valid = #{isValid,jdbcType=INTEGER},
+      </if>
+      <if test="price != null">
+        price = #{price,jdbcType=DOUBLE},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}  and is_valid = 1
+  </update>
+  <update id="updateShoppingCartByUserId" >
+    update biz_shopping_cart
+    set 
+      is_valid = 0
+    where user_id = #{userId} and is_valid = 1
+  </update>
+  <update id="deleteByPrimaryKeyAndUserId" >
+    update biz_shopping_cart
+    set 
+      is_valid = 0
+    where user_id = #{userId} and id in 
+    <foreach collection="idList" item="item" close=")" open="(" index="index" separator=",">
+    			#{item}
+ 		</foreach>
+    and is_valid = 1
+   
+  </update>
+  <update id="updateShoppingCart" >
+    update biz_shopping_cart
+    set 
+      num = #{num}
+    where user_id = #{userId} and id = #{id} and is_valid = 1
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.quantum.engine.homy.model.BizShoppingCart">
+    update biz_shopping_cart
+    set user_id = #{userId,jdbcType=INTEGER},
+      brand_id = #{brandId,jdbcType=INTEGER},
+      goods_id = #{goodsId,jdbcType=INTEGER},
+      goods_sku_id = #{goodsSkuId,jdbcType=INTEGER},
+      num = #{num,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      is_valid = #{isValid,jdbcType=INTEGER},
+      price = #{price,jdbcType=DOUBLE}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

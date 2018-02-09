@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:aop="http://www.springframework.org/schema/aop"
+		xmlns:p="http://www.springframework.org/schema/p"
+		xmlns:tx="http://www.springframework.org/schema/tx"
+		xmlns:context="http://www.springframework.org/schema/context"
+		xmlns:util="http://www.springframework.org/schema/util"
+		xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+			http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+	
+    <context:component-scan base-package="com.quantum.engine.homy.service"/>
+    <context:component-scan base-package="com.quantum.engine.homy.pay.ali"/>
+	
+	<!-- Properties文件读取配置，base的properties -->
+	<!-- <context:property-placeholder location="classpath:/jdbc.properties"/>--> 
+	<util:properties id="dataSourceProps" location="classpath:/jdbc.properties"/>
+
+    <!-- define the SqlSessionFactory, notice that configLocation is not needed when you use MapperFactoryBean -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="configLocation" value="classpath:/mybatis-config.xml" />
+        <property name="mapperLocations">  
+            <list>  
+                <value>classpath:com/quantum/engine/homy/dao/mapper/*.xml</value>  
+            </list>  
+        </property>
+    </bean>
+	
+	<!-- JNDI获取数据源(使用c3p0连接池) -->
+	<!--<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close" dependency-check="none">
+        <property name="driverClass" value="${jdbc.driverClassName}" />
+        <property name="jdbcUrl" value="${jdbc.url}" />
+        <property name="user" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
+        <property name="autoCommitOnClose" value="true"/>
+        <property name="checkoutTimeout" value="${cpool.checkoutTimeout}"/>
+        <property name="initialPoolSize" value="${cpool.minPoolSize}"/>
+        <property name="minPoolSize" value="${cpool.minPoolSize}"/>
+        <property name="maxPoolSize" value="${cpool.maxPoolSize}"/>
+        <property name="maxIdleTime" value="${cpool.maxIdleTime}"/>
+        <property name="acquireIncrement" value="${cpool.acquireIncrement}"/>
+        <property name="maxIdleTimeExcessConnections" value="${cpool.maxIdleTimeExcessConnections}"/>
+    </bean> -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close" dependency-check="none">
+        <property name="driverClass" value="#{dataSourceProps['jdbc.driverClassName']}" />
+        <property name="jdbcUrl" value="#{dataSourceProps['jdbc.url']}" />
+        <property name="user" value="#{dataSourceProps['jdbc.username']}" />
+        <property name="password" value="#{dataSourceProps['jdbc.password']}" />
+        <property name="autoCommitOnClose" value="true"/>
+        <property name="checkoutTimeout" value="#{dataSourceProps['cpool.checkoutTimeout']}"/>
+        <property name="initialPoolSize" value="#{dataSourceProps['cpool.minPoolSize']}"/>
+        <property name="minPoolSize" value="#{dataSourceProps['cpool.minPoolSize']}"/>
+        <property name="maxPoolSize" value="#{dataSourceProps['cpool.maxPoolSize']}"/>
+        <property name="maxIdleTime" value="#{dataSourceProps['cpool.maxIdleTime']}"/>
+        <property name="acquireIncrement" value="#{dataSourceProps['cpool.acquireIncrement']}"/>
+        <property name="maxIdleTimeExcessConnections" value="#{dataSourceProps['cpool.maxIdleTimeExcessConnections']}"/>
+    </bean>
+	
+	<!-- transaction manager, use JtaTransactionManager for global tx -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    
+    <!-- 通过AOP配置提供事务增强，让service包下所有Bean的所有方法拥有事务 -->
+    <aop:config proxy-target-class="true">
+        <aop:pointcut id="serviceMethod"
+            expression=" execution(* com.quantum.engine.homy.service..*(..))" />
+        <aop:advisor pointcut-ref="serviceMethod" advice-ref="txAdvice" />
+    </aop:config>
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="*" />
+        </tx:attributes>
+    </tx:advice>
+
+    <!-- scan for mappers and let them be autowired -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+    	<!-- Mapper接口所在包名 -->
+        <property name="basePackage" value="com.quantum.engine.homy.dao" />
+    </bean>	
+</beans>

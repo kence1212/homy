@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quantum.engine.homy.dao.BizOtherLoginMapper">
+  <resultMap id="BaseResultMap" type="com.quantum.engine.homy.model.BizOtherLogin">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="openid" jdbcType="VARCHAR" property="openid" />
+    <result column="unionid" jdbcType="VARCHAR" property="unionid" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="portrait" jdbcType="VARCHAR" property="portrait" />
+    <result column="nickname" jdbcType="VARCHAR" property="nickname" />
+    <result column="login_token" jdbcType="VARCHAR" property="loginToken" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="create_token_time" jdbcType="TIMESTAMP" property="createTokenTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, openid, unionid, type, portrait, nickname, login_token, user_id, create_time, create_token_time
+  </sql>
+  <select id="getByTypeAndUserId"  resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from biz_other_login
+    where type = #{type} and user_id = #{userId}
+  </select>
+  <select id="getByOpenId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from biz_other_login
+    where openid = #{openid}
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from biz_other_login
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from biz_other_login
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.quantum.engine.homy.model.BizOtherLogin" useGeneratedKeys="true" keyProperty="id">
+    insert into biz_other_login (id, openid, unionid, 
+      type, portrait, nickname, 
+      login_token, user_id, create_time, create_token_time 
+      )
+    values (#{id,jdbcType=INTEGER}, #{openid,jdbcType=VARCHAR}, #{unionid,jdbcType=VARCHAR}, 
+      #{type,jdbcType=INTEGER}, #{portrait,jdbcType=VARCHAR}, #{nickname,jdbcType=VARCHAR}, 
+      #{loginToken,jdbcType=VARCHAR}, #{userId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{createTokenTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.quantum.engine.homy.model.BizOtherLogin">
+    insert into biz_other_login
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="openid != null">
+        openid,
+      </if>
+      <if test="unionid != null">
+        unionid,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="portrait != null">
+        portrait,
+      </if>
+      <if test="nickname != null">
+        nickname,
+      </if>
+      <if test="loginToken != null">
+        login_token,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="createTokenTime != null">
+        create_token_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="openid != null">
+        #{openid,jdbcType=VARCHAR},
+      </if>
+      <if test="unionid != null">
+        #{unionid,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="portrait != null">
+        #{portrait,jdbcType=VARCHAR},
+      </if>
+      <if test="nickname != null">
+        #{nickname,jdbcType=VARCHAR},
+      </if>
+      <if test="loginToken != null">
+        #{loginToken,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTokenTime != null">
+        #{createTokenTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.quantum.engine.homy.model.BizOtherLogin">
+    update biz_other_login
+    <set>
+      <if test="openid != null">
+        openid = #{openid,jdbcType=VARCHAR},
+      </if>
+      <if test="unionid != null">
+        unionid = #{unionid,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="portrait != null">
+        portrait = #{portrait,jdbcType=VARCHAR},
+      </if>
+      <if test="nickname != null">
+        nickname = #{nickname,jdbcType=VARCHAR},
+      </if>
+      <if test="loginToken != null">
+        login_token = #{loginToken,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTokenTime != null">
+    	create_token_time = #{createTokenTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateUserId" >
+    update biz_other_login
+    set user_id = #{userId,jdbcType=INTEGER}
+    where login_token = #{loginToken} and id = #{otherLoginId} and unix_timestamp(create_token_time)+3600 > unix_timestamp() 
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.quantum.engine.homy.model.BizOtherLogin">
+    update biz_other_login
+    set openid = #{openid,jdbcType=VARCHAR},
+      unionid = #{unionid,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER},
+      portrait = #{portrait,jdbcType=VARCHAR},
+      nickname = #{nickname,jdbcType=VARCHAR},
+      login_token = #{loginToken,jdbcType=VARCHAR},
+      user_id = #{userId,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      create_token_time = #{createTokenTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

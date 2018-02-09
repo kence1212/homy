@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quantum.engine.homy.dao.SysPermissionMapper">
+  <resultMap id="BaseResultMap" type="com.quantum.engine.homy.model.SysPermission">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="permission_name" jdbcType="VARCHAR" property="permissionName" />
+    <result column="permission_uri" jdbcType="VARCHAR" property="permissionUri" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="create_id" jdbcType="INTEGER" property="createId" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="modify_id" jdbcType="INTEGER" property="modifyId" />
+    <result column="permission_model_id" jdbcType="INTEGER" property="permissionModelId" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="BaseResultWithModelNameMap" type="com.quantum.engine.homy.model.ext.SysPermissionExt">
+  	  <result column="modelName" jdbcType="VARCHAR" property="modelName" />
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    id, permission_name, permission_uri, create_time, create_id, modify_time, modify_id, 
+    permission_model_id
+  </sql>
+  <select id="getTotalCount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+    select 
+  	count(*)
+    from sys_permission p 
+    left join sys_permission_model m on p.permission_model_id = m.id
+    <where>
+   	   <if test="keyword != null">
+   	   		and m.name like #{keyword} or p.permission_name like #{keyword}
+   	   </if>
+   	   <if test="modelId != null">
+   	   		and p.permission_model_id = #{modelId}
+   	   </if>
+    </where>
+  </select>
+  <select id="getByModelId" parameterType="java.lang.Integer" resultMap="BaseResultWithModelNameMap">
+    select 
+    p.id, p.permission_name, p.permission_uri, p.create_time, p.create_id, p.modify_time, p.modify_id, 
+    p.permission_model_id, m.name as modelName
+    from sys_permission p 
+    left join sys_permission_model m on p.permission_model_id = m.id
+	 where p.permission_model_id = #{modelId,jdbcType=INTEGER}
+  </select>
+  <select id="getList"  resultMap="BaseResultWithModelNameMap">
+    select 
+    p.id, p.permission_name, p.permission_uri, p.create_time, p.create_id, p.modify_time, p.modify_id, 
+    p.permission_model_id, m.name as modelName
+    from sys_permission p 
+    left join sys_permission_model m on p.permission_model_id = m.id
+    <where>
+   	   <if test="keyword != null">
+   	   		and m.name like #{keyword} or p.permission_name like #{keyword}
+   	   </if>
+   	   <if test="modelId != null">
+   	   		and p.permission_model_id = #{modelId}
+   	   </if>
+    </where>
+    order by p.create_time desc
+    <if test="pageNum > 0">
+    	limit #{startIndex},#{pageSize}
+    </if>
+  </select>
+  <select id="selectByNameAndUrlAndMId"  resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sys_permission
+    where permission_name = #{permissionName} and permission_uri = #{url} and permission_model_id = #{modelId}
+    <if test="permissionId != null">
+    	and id != #{permissionId}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sys_permission
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from sys_permission
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.quantum.engine.homy.model.SysPermission">
+    insert into sys_permission (id, permission_name, permission_uri, 
+      create_time, create_id, modify_time, 
+      modify_id, permission_model_id)
+    values (#{id,jdbcType=INTEGER}, #{permissionName,jdbcType=VARCHAR}, #{permissionUri,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=INTEGER}, #{modifyTime,jdbcType=TIMESTAMP}, 
+      #{modifyId,jdbcType=INTEGER}, #{permissionModelId,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.quantum.engine.homy.model.SysPermission">
+    insert into sys_permission
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="permissionName != null">
+        permission_name,
+      </if>
+      <if test="permissionUri != null">
+        permission_uri,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="createId != null">
+        create_id,
+      </if>
+      <if test="modifyTime != null">
+        modify_time,
+      </if>
+      <if test="modifyId != null">
+        modify_id,
+      </if>
+      <if test="permissionModelId != null">
+        permission_model_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="permissionName != null">
+        #{permissionName,jdbcType=VARCHAR},
+      </if>
+      <if test="permissionUri != null">
+        #{permissionUri,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createId != null">
+        #{createId,jdbcType=INTEGER},
+      </if>
+      <if test="modifyTime != null">
+        #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyId != null">
+        #{modifyId,jdbcType=INTEGER},
+      </if>
+      <if test="permissionModelId != null">
+        #{permissionModelId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.quantum.engine.homy.model.SysPermission">
+    update sys_permission
+    <set>
+      <if test="permissionName != null">
+        permission_name = #{permissionName,jdbcType=VARCHAR},
+      </if>
+      <if test="permissionUri != null">
+        permission_uri = #{permissionUri,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createId != null">
+        create_id = #{createId,jdbcType=INTEGER},
+      </if>
+      <if test="modifyTime != null">
+        modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyId != null">
+        modify_id = #{modifyId,jdbcType=INTEGER},
+      </if>
+      <if test="permissionModelId != null">
+        permission_model_id = #{permissionModelId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.quantum.engine.homy.model.SysPermission">
+    update sys_permission
+    set permission_name = #{permissionName,jdbcType=VARCHAR},
+      permission_uri = #{permissionUri,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      create_id = #{createId,jdbcType=INTEGER},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      modify_id = #{modifyId,jdbcType=INTEGER},
+      permission_model_id = #{permissionModelId,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

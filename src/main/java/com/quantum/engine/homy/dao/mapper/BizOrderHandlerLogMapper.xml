@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quantum.engine.homy.dao.BizOrderHandlerLogMapper">
+  <resultMap id="BaseResultMap" type="com.quantum.engine.homy.model.BizOrderHandlerLog">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="order_id" jdbcType="INTEGER" property="orderId" />
+    <result column="pre_order_state" jdbcType="INTEGER" property="preOrderState" />
+    <result column="fin_order_state" jdbcType="INTEGER" property="finOrderState" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="record_time" jdbcType="TIMESTAMP" property="recordTime" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.quantum.engine.homy.model.BizOrderHandlerLog">
+    <result column="remark" jdbcType="LONGVARCHAR" property="remark" />
+  </resultMap>
+  <resultMap extends="ResultMapWithBLOBs" id="ResultMapWithUserName" type="com.quantum.engine.homy.model.ext.BizOrderHandlerLogExt">
+	<result property="userName" column="username" />
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    id, order_id, pre_order_state, fin_order_state, user_id, record_time
+  </sql>
+  <sql id="Blob_Column_List">
+    remark
+  </sql>
+  <select id="getLogByOrderId" parameterType="java.lang.Integer" resultMap="ResultMapWithUserName">
+    select 
+    l.id, l.order_id, l.pre_order_state, l.fin_order_state, l.user_id, l.record_time
+    , l.remark, u.username 
+    from biz_order_handler_log l
+    left join biz_user u on u.user_id = l.user_id
+    where order_id = #{orderId,jdbcType=INTEGER}
+    order by record_time asc
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from biz_order_handler_log
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from biz_order_handler_log
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.quantum.engine.homy.model.BizOrderHandlerLog">
+    insert into biz_order_handler_log (id, order_id, pre_order_state, 
+      fin_order_state, user_id, record_time, 
+      remark)
+    values (#{id,jdbcType=INTEGER}, #{orderId,jdbcType=INTEGER}, #{preOrderState,jdbcType=INTEGER}, 
+      #{finOrderState,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{recordTime,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.quantum.engine.homy.model.BizOrderHandlerLog">
+    insert into biz_order_handler_log
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="orderId != null">
+        order_id,
+      </if>
+      <if test="preOrderState != null">
+        pre_order_state,
+      </if>
+      <if test="finOrderState != null">
+        fin_order_state,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="recordTime != null">
+        record_time,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="orderId != null">
+        #{orderId,jdbcType=INTEGER},
+      </if>
+      <if test="preOrderState != null">
+        #{preOrderState,jdbcType=INTEGER},
+      </if>
+      <if test="finOrderState != null">
+        #{finOrderState,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="recordTime != null">
+        #{recordTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.quantum.engine.homy.model.BizOrderHandlerLog">
+    update biz_order_handler_log
+    <set>
+      <if test="orderId != null">
+        order_id = #{orderId,jdbcType=INTEGER},
+      </if>
+      <if test="preOrderState != null">
+        pre_order_state = #{preOrderState,jdbcType=INTEGER},
+      </if>
+      <if test="finOrderState != null">
+        fin_order_state = #{finOrderState,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="recordTime != null">
+        record_time = #{recordTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.quantum.engine.homy.model.BizOrderHandlerLog">
+    update biz_order_handler_log
+    set order_id = #{orderId,jdbcType=INTEGER},
+      pre_order_state = #{preOrderState,jdbcType=INTEGER},
+      fin_order_state = #{finOrderState,jdbcType=INTEGER},
+      user_id = #{userId,jdbcType=INTEGER},
+      record_time = #{recordTime,jdbcType=TIMESTAMP},
+      remark = #{remark,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.quantum.engine.homy.model.BizOrderHandlerLog">
+    update biz_order_handler_log
+    set order_id = #{orderId,jdbcType=INTEGER},
+      pre_order_state = #{preOrderState,jdbcType=INTEGER},
+      fin_order_state = #{finOrderState,jdbcType=INTEGER},
+      user_id = #{userId,jdbcType=INTEGER},
+      record_time = #{recordTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

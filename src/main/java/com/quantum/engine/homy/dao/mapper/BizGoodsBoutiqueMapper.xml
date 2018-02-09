@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quantum.engine.homy.dao.BizGoodsBoutiqueMapper">
+  <resultMap id="BaseResultMap" type="com.quantum.engine.homy.model.BizGoodsBoutique">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="img_path" jdbcType="VARCHAR" property="imgPath" />
+    <result column="position" jdbcType="INTEGER" property="position" />
+    <result column="goods_id" jdbcType="INTEGER" property="goodsId" />
+    <result column="sort" jdbcType="INTEGER" property="sort" />
+    <result column="desc" jdbcType="VARCHAR" property="desc" />
+    <result column="create_id" jdbcType="INTEGER" property="createId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="modify_id" jdbcType="INTEGER" property="modifyId" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+  </resultMap>
+  
+  <resultMap extends="BaseResultMap" id="BaseResultWithGoodsMap" type="com.quantum.engine.homy.model.ext.BizGoodsBoutiqueExt">
+  	<association property="bizGoodsBase" column="goods_id" select="com.quantum.engine.homy.dao.BizGoodsBaseMapper.selectByPrimaryKey"></association>
+  </resultMap>
+  
+  
+  <sql id="Base_Column_List">
+    id, type, img_path, position, goods_id, sort, `desc`, create_id, create_time, modify_id, 
+    modify_time
+  </sql>
+  
+  <select id="listAll" parameterType="java.lang.Integer" resultMap="BaseResultWithGoodsMap">
+    select 
+    <include refid="Base_Column_List" />
+    from biz_goods_boutique
+  </select>
+  
+  <select id="listByType" parameterType="java.lang.Integer" resultMap="BaseResultWithGoodsMap">
+  	select 
+    <include refid="Base_Column_List" />
+    from biz_goods_boutique
+    where type = #{type}
+    limit 0,2
+  </select>
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from biz_goods_boutique
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from biz_goods_boutique
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.quantum.engine.homy.model.BizGoodsBoutique">
+    insert into biz_goods_boutique (id, type, img_path, 
+      position, goods_id, sort, 
+      `desc`, create_id, create_time, 
+      modify_id, modify_time)
+    values (#{id,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, #{imgPath,jdbcType=VARCHAR}, 
+      #{position,jdbcType=INTEGER}, #{goodsId,jdbcType=INTEGER}, #{sort,jdbcType=INTEGER}, 
+      #{desc,jdbcType=VARCHAR}, #{createId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{modifyId,jdbcType=INTEGER}, #{modifyTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.quantum.engine.homy.model.BizGoodsBoutique">
+    insert into biz_goods_boutique
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="imgPath != null">
+        img_path,
+      </if>
+      <if test="position != null">
+        position,
+      </if>
+      <if test="goodsId != null">
+        goods_id,
+      </if>
+      <if test="sort != null">
+        sort,
+      </if>
+      <if test="`desc` != null">
+        desc,
+      </if>
+      <if test="createId != null">
+        create_id,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="modifyId != null">
+        modify_id,
+      </if>
+      <if test="modifyTime != null">
+        modify_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="imgPath != null">
+        #{imgPath,jdbcType=VARCHAR},
+      </if>
+      <if test="position != null">
+        #{position,jdbcType=INTEGER},
+      </if>
+      <if test="goodsId != null">
+        #{goodsId,jdbcType=INTEGER},
+      </if>
+      <if test="sort != null">
+        #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="desc != null">
+        #{desc,jdbcType=VARCHAR},
+      </if>
+      <if test="createId != null">
+        #{createId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyId != null">
+        #{modifyId,jdbcType=INTEGER},
+      </if>
+      <if test="modifyTime != null">
+        #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.quantum.engine.homy.model.BizGoodsBoutique">
+    update biz_goods_boutique
+    <set>
+      <if test="type != null">
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="imgPath != null">
+        img_path = #{imgPath,jdbcType=VARCHAR},
+      </if>
+      <if test="position != null">
+        position = #{position,jdbcType=INTEGER},
+      </if>
+      <if test="goodsId != null">
+        goods_id = #{goodsId,jdbcType=INTEGER},
+      </if>
+      <if test="sort != null">
+        sort = #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="desc != null">
+        `desc` = #{desc,jdbcType=VARCHAR},
+      </if>
+      <if test="createId != null">
+        create_id = #{createId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyId != null">
+        modify_id = #{modifyId,jdbcType=INTEGER},
+      </if>
+      <if test="modifyTime != null">
+        modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.quantum.engine.homy.model.BizGoodsBoutique">
+    update biz_goods_boutique
+    set type = #{type,jdbcType=INTEGER},
+      img_path = #{imgPath,jdbcType=VARCHAR},
+      position = #{position,jdbcType=INTEGER},
+      goods_id = #{goodsId,jdbcType=INTEGER},
+      sort = #{sort,jdbcType=INTEGER},
+      `desc` = #{desc,jdbcType=VARCHAR},
+      create_id = #{createId,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      modify_id = #{modifyId,jdbcType=INTEGER},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

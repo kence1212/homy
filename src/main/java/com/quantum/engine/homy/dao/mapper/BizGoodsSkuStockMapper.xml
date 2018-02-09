@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quantum.engine.homy.dao.BizGoodsSkuStockMapper">
+  <resultMap id="BaseResultMap" type="com.quantum.engine.homy.model.BizGoodsSkuStock">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="stock" jdbcType="INTEGER" property="stock" />
+    <result column="sku_id" jdbcType="INTEGER" property="skuId" />
+    <result column="city_id" jdbcType="INTEGER" property="cityId" />
+    <result column="create_id" jdbcType="INTEGER" property="createId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="modify_id" jdbcType="INTEGER" property="modifyId" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="price" jdbcType="DOUBLE" property="price" />
+  </resultMap>
+  <resultMap  id="ResultWithSkuMap" type="com.quantum.engine.homy.model.ext.BizGoodsSkuStockExt">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="goods_id" jdbcType="INTEGER" property="goodsId" />
+    <result column="color_id" jdbcType="INTEGER" property="colorId" />
+    <result column="size_id" jdbcType="INTEGER" property="sizeId" />
+    <result column="texture_id" jdbcType="INTEGER" property="textureId" />
+    <result column="create_id" jdbcType="INTEGER" property="createId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="stock" jdbcType="INTEGER" property="stock" />
+    <result column="city_id" jdbcType="INTEGER" property="cityId" />
+    <result column="price" jdbcType="DOUBLE" property="price" />
+    <result column="goods_name" jdbcType="VARCHAR" property="goodsName" />
+    <result column="r_name" jdbcType="VARCHAR" property="cityName" />
+    <result column="c_name" jdbcType="VARCHAR" property="colorName" />
+    <result column="si_name" jdbcType="VARCHAR" property="sizeName" />
+    <result column="t_name" jdbcType="VARCHAR" property="textureName" />
+    <result column="sku_icon" jdbcType="VARCHAR" property="skuIcon" />
+    <result column="brand_id" jdbcType="INTEGER" property="brandId" />
+    <result column="brand_name" jdbcType="VARCHAR" property="brandName" />
+    
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, stock, sku_id, city_id, create_id, create_time, modify_id, modify_time, price
+  </sql>
+  
+  <select id="countByColorId" resultType="int" parameterType="int">
+  	select count(1) from biz_goods_sku_stock bgss left join biz_goods_sku bgs on bgs.id = bgss.sku_id where bgs.color_id = #{value}
+  </select>
+  
+  <select id="countBySizeId" resultType="int" parameterType="int">
+  	select count(1) from biz_goods_sku_stock bgss left join biz_goods_sku bgs on bgs.id = bgss.sku_id where bgs.size_id = #{value}
+  </select>
+  
+  <select id="countByTextureId" resultType="int" parameterType="int">
+  	select count(1) from biz_goods_sku_stock bgss left join biz_goods_sku bgs on bgs.id = bgss.sku_id where bgs.texture_id = #{value}
+  </select>
+  
+  <update id="setStock" >
+    update biz_goods_sku_stock
+    set stock = stock + #{add}
+    where sku_id = #{goodsSkuId} and city_id = #{cityId}
+  </update>
+  
+  <sql id="Connect_Column_List">
+    s.id, s.stock, s.sku_id, s.city_id, s.create_time, s.create_id, s.price, k.goods_id, 
+    k.color_id, k.size_id, k.texture_id, g.goods_name, r.name as r_name, c.name as c_name,
+    si.name as si_name, t.texture_name as t_name, k.sku_icon
+  </sql>
+  
+   <sql id="Goods_Column_List">
+    s.id, s.stock, s.sku_id, s.city_id, s.create_time, s.create_id, s.price, k.goods_id, 
+    k.color_id, k.size_id, k.texture_id, g.goods_name, r.name as r_name, c.name as c_name,
+    si.name as si_name, t.texture_name as t_name, k.sku_icon, b.brand_id, b.brand_name
+  </sql>
+  
+  <select id="getById" resultMap="ResultWithSkuMap">
+    select 
+    <include refid="Connect_Column_List" />
+    from biz_goods_sku_stock s
+    left join biz_goods_sku k on k.id = s.sku_id
+    left join biz_goods_base g on k.goods_id = g.id
+    left join bas_region r on s.city_id = r.id
+    left join biz_goods_color c on k.color_id = c.id
+    left join biz_goods_size si on k.size_id = si.id
+    left join biz_goods_texture t on k.texture_id = t.id
+    where s.id = #{id}
+  </select>
+  
+  <select id="getList" resultMap="ResultWithSkuMap">
+    select 
+    <include refid="Connect_Column_List" />
+    from biz_goods_sku_stock s
+    left join biz_goods_sku k on k.id = s.sku_id
+    left join biz_goods_base g on k.goods_id = g.id
+    left join bas_region r on s.city_id = r.id
+    left join biz_goods_color c on k.color_id = c.id
+    left join biz_goods_size si on k.size_id = si.id
+    left join biz_goods_texture t on k.texture_id = t.id
+  	<where>
+  		<if test="keyword != null and keyword != ''">
+  			and g.goods_name like #{keyword} or r.name like #{keyword} or c.name like #{keyword} or si.name like #{keyword} or t.texture_name like #{keyword} 
+  		</if>
+  		<if test="goodsId != null">
+  			and k.goods_id = #{goodsId}
+  		</if>
+  	</where>
+  	order by s.create_time desc
+  	<if test="page > 0">
+  		limit #{startIndex},#{pageSize}
+  	</if>
+  </select>
+  
+  <select id="getGoodsByGoodsIdAndCity" resultMap="ResultWithSkuMap">
+  	select 
+    <include refid="Goods_Column_List" />
+    from biz_goods_sku_stock s
+    left join biz_goods_sku k on k.id = s.sku_id
+    left join biz_goods_base g on k.goods_id = g.id
+    left join bas_goods_brand b on b.brand_id = g.brand_id
+    left join bas_region r on s.city_id = r.id
+    left join biz_goods_color c on k.color_id = c.id
+    left join biz_goods_size si on k.size_id = si.id
+    left join biz_goods_texture t on k.texture_id = t.id
+  	<where>
+  		<if test="goodsId != null">
+  			and k.goods_id = #{goodsId}
+  		</if>
+  		<if test="cityId != null">
+  			and s.city_id = #{cityId}
+  		</if>
+  		<if test="colorId != null">
+  			and k.color_id = #{colorId}
+  		</if>
+  		<if test="sizeId != null">
+  			and k.size_id = #{sizeId}
+  		</if>
+  		<if test="textureId != null">
+  			and k.texture_id = #{textureId}
+  		</if>
+  	</where>
+  </select>
+  <select id="getByGoodsAndCity" resultMap="ResultWithSkuMap">
+  	select 
+    <include refid="Connect_Column_List" />
+    from biz_goods_sku_stock s
+    left join biz_goods_sku k on k.id = s.sku_id
+    left join biz_goods_base g on k.goods_id = g.id
+    left join bas_region r on s.city_id = r.id
+    left join biz_goods_color c on k.color_id = c.id
+    left join biz_goods_size si on k.size_id = si.id
+    left join biz_goods_texture t on k.texture_id = t.id
+  	<where>
+  		<if test="goodsId != null">
+  			and k.goods_id = #{goodsId}
+  		</if>
+  		<if test="cityId != null">
+  			and s.city_id = #{cityId}
+  		</if>
+  	</where>
+  	order by s.create_time desc
+  </select>
+  
+
+  <select id="getBySkuIdAndCityIdWithSku" parameterType="java.lang.Integer" resultMap="ResultWithSkuMap">
+    select 
+    <include refid="Connect_Column_List" />
+    from biz_goods_sku_stock s
+    left join biz_goods_sku k on k.id = s.sku_id
+    left join biz_goods_base g on k.goods_id = g.id
+    left join bas_region r on s.city_id = r.id
+    left join biz_goods_color c on k.color_id = c.id
+    left join biz_goods_size si on k.size_id = si.id
+    left join biz_goods_texture t on k.texture_id = t.id
+    where s.sku_id = #{skuId,jdbcType=INTEGER} and s.city_id = #{cityId,jdbcType=INTEGER}
+  </select>
+  
+  <select id="getBySkuIdAndCityId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from biz_goods_sku_stock
+    where sku_id = #{skuId,jdbcType=INTEGER} and city_id = #{cityId,jdbcType=INTEGER}
+  </select>
+  
+  <select id="getTotalCount"  resultType="java.lang.Integer">
+    select count(*)
+    from biz_goods_sku_stock s
+    left join biz_goods_sku k on k.id = s.sku_id
+    left join biz_goods_base g on k.goods_id = g.id
+    left join bas_region r on s.city_id = r.id
+    left join biz_goods_color c on k.color_id = c.id
+    left join biz_goods_size si on k.size_id = si.id
+    left join biz_goods_texture t on k.texture_id = t.id
+  	<where>
+  		<if test="keyword != null and keyword != ''">
+  			and g.goods_name like #{keyword} or r.name like #{keyword} or c.name like #{keyword} or si.name like #{keyword} or t.texture_name like #{keyword} 
+  		</if>
+  		<if test="goodsId != null">
+  			and k.goods_id = #{goodsId}
+  		</if>
+  	</where>
+  </select>
+  
+  
+  <select id="getTotalCountBySkuId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+    select count(*)
+    from biz_goods_sku_stock
+    where sku_id = #{skuId,jdbcType=INTEGER}
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from biz_goods_sku_stock
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from biz_goods_sku_stock
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.quantum.engine.homy.model.BizGoodsSkuStock">
+    insert into biz_goods_sku_stock (id, stock, sku_id, 
+      city_id, create_id, create_time, 
+      modify_id, modify_time, price
+      )
+    values (#{id,jdbcType=INTEGER}, #{stock,jdbcType=INTEGER}, #{skuId,jdbcType=INTEGER}, 
+      #{cityId,jdbcType=INTEGER}, #{createId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{modifyId,jdbcType=INTEGER}, #{modifyTime,jdbcType=TIMESTAMP}, #{price,jdbcType=DOUBLE}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.quantum.engine.homy.model.BizGoodsSkuStock">
+    insert into biz_goods_sku_stock
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="stock != null">
+        stock,
+      </if>
+      <if test="skuId != null">
+        sku_id,
+      </if>
+      <if test="cityId != null">
+        city_id,
+      </if>
+      <if test="createId != null">
+        create_id,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="modifyId != null">
+        modify_id,
+      </if>
+      <if test="modifyTime != null">
+        modify_time,
+      </if>
+      <if test="price != null">
+        price,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="stock != null">
+        #{stock,jdbcType=INTEGER},
+      </if>
+      <if test="skuId != null">
+        #{skuId,jdbcType=INTEGER},
+      </if>
+      <if test="cityId != null">
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="createId != null">
+        #{createId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyId != null">
+        #{modifyId,jdbcType=INTEGER},
+      </if>
+      <if test="modifyTime != null">
+        #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="price != null">
+        #{price,jdbcType=DOUBLE},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.quantum.engine.homy.model.BizGoodsSkuStock">
+    update biz_goods_sku_stock
+    <set>
+      <if test="stock != null">
+        stock = #{stock,jdbcType=INTEGER},
+      </if>
+      <if test="skuId != null">
+        sku_id = #{skuId,jdbcType=INTEGER},
+      </if>
+      <if test="cityId != null">
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="createId != null">
+        create_id = #{createId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyId != null">
+        modify_id = #{modifyId,jdbcType=INTEGER},
+      </if>
+      <if test="modifyTime != null">
+        modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="price != null">
+        price = #{price,jdbcType=DOUBLE},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.quantum.engine.homy.model.BizGoodsSkuStock">
+    update biz_goods_sku_stock
+    set stock = #{stock,jdbcType=INTEGER},
+      sku_id = #{skuId,jdbcType=INTEGER},
+      city_id = #{cityId,jdbcType=INTEGER},
+      create_id = #{createId,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      modify_id = #{modifyId,jdbcType=INTEGER},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      price = #{price,jdbcType=DOUBLE}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+</mapper>

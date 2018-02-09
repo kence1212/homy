@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quantum.engine.homy.dao.BasGoodsBrandMapper">
+
+	<!-- <cache type="org.mybatis.caches.ehcache.LoggingEhcache" /> -->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+
+	<resultMap id="BaseResultMap" type="com.quantum.engine.homy.model.BasGoodsBrand">
+		<id column="brand_id" jdbcType="INTEGER" property="brandId" />
+		<result column="brand_name" jdbcType="VARCHAR" property="brandName" />
+		<result column="brand_code" jdbcType="VARCHAR" property="brandCode" />
+		<result column="brand_desc" jdbcType="VARCHAR" property="brandDesc" />
+		<result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="create_id" jdbcType="INTEGER" property="createId" />
+		<result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+		<result column="modify_id" jdbcType="INTEGER" property="modifyId" />
+		<result column="icon" jdbcType="VARCHAR" property="icon" />
+		<result column="remark" jdbcType="VARCHAR" property="remark" />
+		<result column="tsort" jdbcType="INTEGER" property="tsort" />
+		 <result column="app_client_icon" jdbcType="VARCHAR" property="appClientIcon" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		brand_id, brand_name, brand_code, brand_desc, create_time,
+		create_id,
+		modify_time,
+		modify_id, icon, remark, tsort, app_client_icon
+	</sql>
+	<select id="getAll" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from bas_goods_brand
+	</select>
+	
+	<select id="listIndexHot" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from bas_goods_brand
+		limit 0,3
+	</select>
+	
+	<select id="listHave3d" resultMap="BaseResultMap" parameterType="java.util.Map">
+		select
+		<include refid="Base_Column_List" />
+		from bas_goods_brand
+		<where>
+			and (
+				brand_id in (
+					select distinct brand_id from biz_goods_base where have_3d = 1 and goods_state = 1
+					<if test="categoryId != null and categoryId != ''">  
+						 and  goods_category_id = #{categoryId}
+		            </if> 
+				)
+			) 
+		</where>
+	</select>
+	
+	<select id="selectByPrimaryKey" parameterType="java.lang.Integer"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from bas_goods_brand
+		where brand_id = #{brandId,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		bas_goods_brand
+		where brand_id = #{brandId,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.quantum.engine.homy.model.BasGoodsBrand"
+		keyProperty="brandId" useGeneratedKeys="true">
+		insert into bas_goods_brand (
+		brand_name, brand_code,
+		brand_desc, create_time, create_id,
+		modify_time, modify_id, icon,
+		remark, tsort, app_client_icon)
+		values (
+		#{brandName,jdbcType=VARCHAR}, #{brandCode,jdbcType=VARCHAR},
+		#{brandDesc,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+		#{createId,jdbcType=INTEGER},
+		#{modifyTime,jdbcType=TIMESTAMP},
+		#{modifyId,jdbcType=INTEGER}, #{icon,jdbcType=VARCHAR},
+		#{remark,jdbcType=VARCHAR}, #{tsort,jdbcType=INTEGER}, #{appClientIcon,jdbcType=VARCHAR})
+	</insert>
+	<insert id="insertSelective" parameterType="com.quantum.engine.homy.model.BasGoodsBrand"
+		keyProperty="brandId" useGeneratedKeys="true">
+		insert into bas_goods_brand
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="brandName != null">
+				brand_name,
+			</if>
+			<if test="brandCode != null">
+				brand_code,
+			</if>
+			<if test="brandDesc != null">
+				brand_desc,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="createId != null">
+				create_id,
+			</if>
+			<if test="modifyTime != null">
+				modify_time,
+			</if>
+			<if test="modifyId != null">
+				modify_id,
+			</if>
+			<if test="icon != null">
+				icon,
+			</if>
+			<if test="remark != null">
+				remark,
+			</if>
+			<if test="tsort != null">
+				tsort,
+			</if>
+			 <if test="appClientIcon != null">
+		        app_client_icon,
+		     </if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="brandName != null">
+				#{brandName,jdbcType=VARCHAR},
+			</if>
+			<if test="brandCode != null">
+				#{brandCode,jdbcType=VARCHAR},
+			</if>
+			<if test="brandDesc != null">
+				#{brandDesc,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createId != null">
+				#{createId,jdbcType=INTEGER},
+			</if>
+			<if test="modifyTime != null">
+				#{modifyTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="modifyId != null">
+				#{modifyId,jdbcType=INTEGER},
+			</if>
+			<if test="icon != null">
+				#{icon,jdbcType=VARCHAR},
+			</if>
+			<if test="remark != null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="tsort != null">
+				#{tsort,jdbcType=INTEGER},
+			</if>
+			<if test="appClientIcon != null">
+		        #{appClientIcon,jdbcType=VARCHAR},
+		    </if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.quantum.engine.homy.model.BasGoodsBrand">
+		update bas_goods_brand
+		<set>
+			<if test="brandName != null">
+				brand_name = #{brandName,jdbcType=VARCHAR},
+			</if>
+			<if test="brandCode != null">
+				brand_code = #{brandCode,jdbcType=VARCHAR},
+			</if>
+			<if test="brandDesc != null">
+				brand_desc = #{brandDesc,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createId != null">
+				create_id = #{createId,jdbcType=INTEGER},
+			</if>
+			<if test="modifyTime != null">
+				modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="modifyId != null">
+				modify_id = #{modifyId,jdbcType=INTEGER},
+			</if>
+			<if test="icon != null">
+				icon = #{icon,jdbcType=VARCHAR},
+			</if>
+			<if test="remark != null">
+				remark = #{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="tsort != null">
+				tsort = #{tsort,jdbcType=INTEGER},
+			</if>
+			<if test="appClientIcon != null">
+		        app_client_icon = #{appClientIcon,jdbcType=VARCHAR},
+		    </if>
+		</set>
+		where brand_id = #{brandId,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.quantum.engine.homy.model.BasGoodsBrand">
+		update
+		bas_goods_brand
+		set brand_name = #{brandName,jdbcType=VARCHAR},
+		brand_code = #{brandCode,jdbcType=VARCHAR},
+		brand_desc =
+		#{brandDesc,jdbcType=VARCHAR},
+		create_time =
+		#{createTime,jdbcType=TIMESTAMP},
+		create_id =
+		#{createId,jdbcType=INTEGER},
+		modify_time =
+		#{modifyTime,jdbcType=TIMESTAMP},
+		modify_id =
+		#{modifyId,jdbcType=INTEGER},
+		icon = #{icon,jdbcType=VARCHAR},
+		remark =
+		#{remark,jdbcType=VARCHAR},
+		tsort = #{tsort,jdbcType=INTEGER},
+		app_client_icon = #{appClientIcon,jdbcType=VARCHAR}
+		where
+		brand_id = #{brandId,jdbcType=INTEGER}
+	</update>
+</mapper>
